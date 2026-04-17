@@ -10,7 +10,6 @@ document.addEventListener('DOMContentLoaded', () => {
     const toggleTheme = () => {
         const isDark = document.documentElement.classList.toggle('dark');
         const newTheme = isDark ? 'dark' : 'light';
-
         localStorage.setItem('hotspot-theme', newTheme);
         updateThemeIcon(newTheme);
         updateBodyTheme(newTheme);
@@ -18,7 +17,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
     const updateBodyTheme = (theme) => {
         if (theme === 'light') {
-            document.body.classList.remove('bg-dark-primary', 'text-white');
+            document.body.classList.remove('dark:bg-dark-primary', 'dark:text-white', 'bg-dark-primary', 'text-white');
             document.body.classList.add('bg-slate-50', 'text-slate-900');
         } else {
             document.body.classList.add('bg-dark-primary', 'text-white');
@@ -29,7 +28,6 @@ document.addEventListener('DOMContentLoaded', () => {
     const updateThemeIcon = (theme) => {
         const iconContainer = document.querySelector('.theme-toggle');
         if (iconContainer) {
-            // Sun Icon for Dark Mode (to switch to light), Moon Icon for Light Mode (to switch to dark)
             if (theme === 'dark') {
                 iconContainer.innerHTML = '<svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5 fill-current" viewBox="0 0 24 24"><path d="M12 7c-2.76 0-5 2.24-5 5s2.24 5 5 5 5-2.24 5-5-2.24-5-5-5zM2 13h2c.55 0 1-.45 1-1s-.45-1-1-1H2c-.55 0-1 .45-1 1s.45 1 1 1zm18 0h2c.55 0 1-.45 1-1s-.45-1-1-1h-2c-.55 0-1 .45-1 1s.45 1 1 1zM11 2v2c0 .55.45 1 1 1s1-.45 1-1V2c0-.55-.45-1-1-1s-1 .45-1 1zm0 18v2c0 .55.45 1 1 1s1-.45 1-1v-2c0-.55-.45-1-1-1s-1 .45-1 1zM5.99 4.58c-.39-.39-1.03-.39-1.41 0s-.39 1.03 0 1.41l1.06 1.06c.39.39 1.03.39 1.41 0s.39-1.03 0-1.41L5.99 4.58zm12.37 12.37c-.39-.39-1.03-.39-1.41 0s-.39 1.03 0 1.41l1.06 1.06c.39.39 1.03.39 1.41 0s.39-1.03 0-1.41l-1.06-1.06zm1.06-12.37c-.39-.39-1.03-.39-1.41 0l-1.06 1.06c-.39.39-.39 1.03 0 1.41s1.03.39 1.41 0l1.06-1.06c.39-.38.39-1.02 0-1.41zm-12.37 12.37c-.39-.39-1.03-.39-1.41 0l-1.06 1.06c-.39.39-.39 1.03 0 1.41s1.03.39 1.41 0l1.06-1.06c.38-.38.38-1.02 0-1.41z"/></svg>';
             } else {
@@ -41,6 +39,43 @@ document.addEventListener('DOMContentLoaded', () => {
     const themeToggleBtn = document.querySelector('.theme-toggle');
     if (themeToggleBtn) themeToggleBtn.addEventListener('click', toggleTheme);
     initTheme();
+
+    // View Management (Portal vs Form)
+    const initialView = document.getElementById('initial-view');
+    const formView = document.getElementById('form-view');
+    const btnAuthenticate = document.getElementById('btn-authenticate');
+    const btnBack = document.getElementById('btn-back');
+
+    const showLoginView = () => {
+        if (initialView && formView) {
+            initialView.classList.add('opacity-0', '-translate-x-10');
+            setTimeout(() => {
+                initialView.classList.add('hidden');
+                formView.classList.remove('hidden');
+                setTimeout(() => {
+                    formView.classList.remove('opacity-0', 'scale-95');
+                }, 50);
+            }, 300);
+        }
+    };
+
+    const hideLoginView = () => {
+        if (initialView && formView) {
+            formView.classList.add('opacity-0', 'scale-95');
+            setTimeout(() => {
+                formView.classList.add('hidden');
+                initialView.classList.remove('hidden');
+                setTimeout(() => {
+                    initialView.classList.remove('opacity-0', '-translate-x-10');
+                }, 50);
+            }, 300);
+        }
+    };
+
+    if (btnAuthenticate) btnAuthenticate.addEventListener('click', showLoginView);
+    if (btnBack) btnBack.addEventListener('click', hideLoginView);
+
+
 
     // Tab Management (Member vs Voucher)
     const tabBtns = document.querySelectorAll('.tab-btn');
@@ -78,7 +113,6 @@ document.addEventListener('DOMContentLoaded', () => {
         loginForm.addEventListener('submit', () => {
             const activeTab = document.querySelector('.tab-btn.active');
             if (activeTab && activeTab.getAttribute('data-type') === 'voucher') {
-                // For Voucher: copy username to password
                 const passInput = loginForm.querySelector('input[name="password"]');
                 const userVal = loginForm.querySelector('input[name="username"]').value;
                 if (passInput) passInput.value = userVal;
@@ -100,7 +134,6 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 });
 
-// Helper: Parse MikroTik uptime string (e.g., 01:20:30 or 1h20m30s)
 function parseUptime(uptimeStr) {
     if (uptimeStr.includes(':')) {
         const parts = uptimeStr.split(':').reverse();
@@ -136,4 +169,5 @@ function formatUptime(seconds) {
     res += (s < 10 ? "0" + s : s);
     return res;
 }
+
 
