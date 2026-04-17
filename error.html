@@ -1,23 +1,47 @@
-<html>
-  <head>
-    <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <meta http-equiv="pragma" content="no-cache" />
-    <meta http-equiv="expires" content="-1" />
-    <title>Internet hotspot - Error</title>
-    <link rel="stylesheet" href="css/style.css" />
-  </head>
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Futuristic Hotspot - Error</title>
+    <link rel="stylesheet" href="css/style.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
 
-  <body>
-    <div class="ie-fixMinHeight">
-      <div class="main">
-        <div class="wrap">
-          <h1>Hotspot error: $(error)</h1>
-          <p class="info">
-            Log in page: <a href="$(link-login)">$(link-login)</a>
-          </p>
+<body>
+    <div class="bg-animation"></div>
+
+    <div class="glass-card">
+        <div style="font-size: 4rem; margin-bottom: 30px; text-align: center;">
+            <i class="fas fa-triangle-exclamation" style="color: #ff3b30;"></i>
         </div>
-      </div>
+        
+        <div class="header">
+            <h1 style="background: linear-gradient(to right, #ff3b30, #ff9f0a); -webkit-background-clip: text;">SYSTEM ERROR</h1>
+            <p>The authentication protocol has encountered an anomaly.</p>
+        </div>
+
+        <div class="error-msg" style="margin: 20px 0;">
+            <strong>Error Details:</strong><br>
+            $(error)
+        </div>
+
+        <div style="color: var(--text-secondary); font-size: 0.9rem; margin-bottom: 30px; line-height: 1.6;">
+            Possible causes:
+            <ul style="margin-left: 20px; list-style-type: square;">
+                <li>Invalid credentials provided</li>
+                <li>Session limit reached</li>
+                <li>Network communication failure</li>
+            </ul>
+        </div>
+
+        <button class="btn-primary" onclick="window.history.back()">
+            RETRY PROTOCOL <i class="fas fa-rotate" style="margin-left: 10px;"></i>
+        </button>
+
+        <div style="text-align: center; margin-top: 25px; font-size: 0.8rem; color: var(--text-secondary); opacity: 0.7;">
+            Error Glyph: $(error)
+        </div>
     </div>
-  </body>
+</body>
 </html>

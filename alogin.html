@@ -1,33 +1,49 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="en">
-  <head>
-    <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <meta http-equiv="refresh" content="2; url=$(link-redirect)" />
-    <meta http-equiv="pragma" content="no-cache" />
-    <meta http-equiv="expires" content="-1" />
-    <title>Internet hotspot - Redirect</title>
-    <link rel="stylesheet" href="css/style.css" />
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="refresh" content="2; url=$(link-orig)">
+    <meta http-equiv="pragma" content="no-cache">
+    <meta http-equiv="expires" content="-1">
+    <title>Futuristic Hotspot - Redirecting</title>
+    <link rel="stylesheet" href="css/style.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <script>
-      function startClock() {
-          $(if popup == 'true')
-          open('$(link-status)', 'hotspot_status', 'toolbar=0,location=0,directories=0,status=0,menubars=0,resizable=1,width=290,height=200');
-      $(endif)
-      location.href = unescape('$(link-redirect-esc)');
-      }
+        function doRedirect() {
+            window.location.href = "$(link-orig)";
+        }
     </script>
-  </head>
+</head>
 
-  <body onLoad="startClock()">
-    <div class="ie-fixMinHeight">
-      <div class="main">
-        <div class="wrap">
-          <h1>You are logged in</h1>
-          <p class="info">
-            If nothing happens, click <a href="$(link-redirect)">here</a>
-          </p>
+<body onLoad="setTimeout(doRedirect, 2000)">
+    <div class="bg-animation"></div>
+
+    <div class="glass-card" style="text-align: center;">
+        <div style="font-size: 4rem; margin-bottom: 30px; animation: glowPulse 2s infinite;">
+            <i class="fas fa-circle-check" style="color: #00ff88;"></i>
         </div>
-      </div>
+        
+        <div class="header">
+            <h1>ACCESS GRANTED</h1>
+            <p>Authentication successful. You are being redirected to your destination.</p>
+        </div>
+
+        <div style="margin: 30px 0;">
+            <div class="spinner" style="margin: 0 auto;"></div>
+        </div>
+
+        <p style="color: var(--text-secondary); font-size: 0.85rem;">
+            If you are not redirected, <a href="$(link-orig)" style="color: var(--accent-blue); text-decoration: none; font-weight: 600;">click here</a>
+        </p>
+
+        <style>
+            @keyframes glowPulse {
+                0% { filter: drop-shadow(0 0 5px rgba(0, 255, 136, 0.4)); }
+                50% { filter: drop-shadow(0 0 20px rgba(0, 255, 136, 0.8)); }
+                100% { filter: drop-shadow(0 0 5px rgba(0, 255, 136, 0.4)); }
+            }
+        </style>
     </div>
-  </body>
+</body>
 </html>

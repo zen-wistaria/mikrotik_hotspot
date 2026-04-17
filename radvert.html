@@ -1,43 +1,57 @@
-<html>
-  <head>
-    <meta http-equiv="refresh" content="2; url=$(link-orig)" />
-    <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <meta http-equiv="pragma" content="no-cache" />
-    <meta http-equiv="expires" content="-1" />
-    <title>Internet hotspot - Advertisement</title>
-    <link rel="stylesheet" href="css/style.css" />
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="refresh" content="2; url=$(link-orig)">
+    <title>Futuristic Hotspot - Advertisement</title>
+    <link rel="stylesheet" href="css/style.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <script>
-      var popup = "";
-      function openOrig() {
-        if (window.focus) popup.focus();
-        location.href = unescape("$(link-orig-esc)");
-      }
-      function openAd() {
-        location.href = unescape("$(link-redirect-esc)");
-      }
-      function openAdvert() {
-        if (window.name != "hotspot_advert") {
-          popup = open("$(link-redirect)", "hotspot_advert", "");
-          setTimeout("openOrig()", 1000);
-          return;
+        var popup = "";
+        function openOrig() {
+            if (window.focus) popup.focus();
+            location.href = unescape("$(link-orig-esc)");
         }
-        setTimeout("openAd()", 1000);
-      }
+        function openAd() {
+            location.href = unescape("$(link-redirect-esc)");
+        }
+        function openAdvert() {
+            if (window.name != "hotspot_advert") {
+                popup = open("$(link-redirect)", "hotspot_advert", "");
+                setTimeout("openOrig()", 1000);
+                return;
+            }
+            setTimeout("openAd()", 1000);
+        }
     </script>
-  </head>
-  <body onLoad="openAdvert()">
-    <div class="ie-fixMinHeight">
-      <div class="main">
-        <div class="wrap">
-          <h1>Advertisement</h1>
-          <p class="info">
-            If nothing happens, open
-            <a href="$(link-redirect)" target="hotspot_advert">advertisement</a>
-            manually.
-          </p>
+</head>
+
+<body onLoad="openAdvert()">
+    <div class="bg-animation"></div>
+
+    <div class="glass-card" style="text-align: center;">
+        <div style="font-size: 3rem; margin-bottom: 20px;">
+            <i class="fas fa-rectangle-ad" style="color: var(--accent-blue);"></i>
         </div>
-      </div>
+        
+        <div class="header">
+            <h1>SPONSORED ACCESS</h1>
+            <p>Authentication redirected. Opening advertisement...</p>
+        </div>
+
+        <div style="margin: 30px 0;">
+            <div class="spinner" style="margin: 0 auto;"></div>
+        </div>
+
+        <p class="info" style="color: var(--text-secondary); font-size: 0.85rem;">
+            If nothing happens, open 
+            <a href="$(link-redirect)" target="hotspot_advert" style="color: var(--accent-blue); font-weight: 600;">advertisement manually</a>.
+        </p>
+
+        <button class="btn-primary" onclick="openOrig()" style="margin-top: 20px;">
+            CONTINUE TO DESTINATION <i class="fas fa-arrow-right" style="margin-left: 10px;"></i>
+        </button>
     </div>
-  </body>
+</body>
 </html>

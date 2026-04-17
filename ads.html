@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Futuristic Hotspot - Sponsored Access</title>
+    <link rel="stylesheet" href="css/style.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+
+<body>
+    <div class="bg-animation"></div>
+
+    <div class="glass-card" style="max-width: 600px;">
+        <div class="header">
+            <span style="font-size: 0.7rem; letter-spacing: 2px; color: var(--accent-purple); font-weight: 700;">SPONSORED ACCESS</span>
+            <h1>UNLOCKED AREA</h1>
+            <p>Please wait a moment while we establish your secure connection.</p>
+        </div>
+
+        <div class="ad-container" style="background: rgba(0,0,0,0.2); border-radius: 12px; overflow: hidden; margin: 20px 0; aspect-ratio: 16/9; display: flex; align-items: center; justify-content: center; border: 1px solid var(--glass-border);">
+            <!-- Placeholder for actual Ad content (Image/Video) -->
+            <div style="text-align: center; color: var(--text-secondary);">
+                <i class="fas fa-clapperboard" style="font-size: 3rem; margin-bottom: 15px; opacity: 0.5;"></i>
+                <p>Advertisement Content Loading...</p>
+                <div style="font-size: 0.8rem; margin-top: 10px;">(Replace this div with your <img /> or <video /> tag)</div>
+            </div>
+        </div>
+
+        <div style="display: flex; align-items: center; justify-content: space-between; gap: 15px;">
+            <div style="flex: 1; height: 4px; background: var(--input-bg); border-radius: 2px;">
+                <div id="progress-bar" style="width: 0%; height: 100%; background: var(--accent-blue); border-radius: 2px; transition: width 0.1s linear;"></div>
+            </div>
+            <div id="countdown" style="font-weight: 700; color: var(--accent-blue); width: 100px; text-align: right;">10s remaining</div>
+        </div>
+
+        <button id="skip-btn" class="btn-primary" style="margin-top: 25px; opacity: 0.5; cursor: not-allowed;" disabled>
+            SKIP ADVERTISEMENT <i class="fas fa-forward" style="margin-left: 10px;"></i>
+        </button>
+
+        <p style="text-align: center; margin-top: 15px; font-size: 0.8rem; color: var(--text-secondary);">
+            Your session will begin automatically after the countdown.
+        </p>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const DURATION = 10; // Configurable duration in seconds
+            let timeLeft = DURATION;
+            const skipBtn = document.getElementById('skip-btn');
+            const countdownEl = document.getElementById('countdown');
+            const progressBar = document.getElementById('progress-bar');
+
+            const timer = setInterval(() => {
+                timeLeft--;
+                const progress = ((DURATION - timeLeft) / DURATION) * 100;
+                progressBar.style.width = progress + '%';
+
+                if (timeLeft > 0) {
+                    countdownEl.textContent = timeLeft + 's remaining';
+                } else {
+                    clearInterval(timer);
+                    countdownEl.textContent = 'Ready!';
+                    skipBtn.style.opacity = '1';
+                    skipBtn.style.cursor = 'pointer';
+                    skipBtn.disabled = false;
+                    
+                    // Auto redirect after a small delay
+                    setTimeout(proceed, 1000);
+                }
+            }, 1000);
+
+            function proceed() {
+                window.location.href = "$(link-login)"; // Redirect to login or status
+            }
+
+            skipBtn.addEventListener('click', proceed);
+        });
+    </script>
+</body>
+</html>
