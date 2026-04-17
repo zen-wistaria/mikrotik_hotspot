@@ -1,17 +1,16 @@
 {
   "name": "hotspot_futuristic",
-  "private": true,
-  "scripts": {
-    "dev": "tailwindcss -i ./css/input.css -o ./css/style.css --watch"
-  },
   "devDependencies": {
     "@types/bun": "latest"
   },
   "peerDependencies": {
     "typescript": "^5"
   },
+  "private": true,
+  "scripts": {
+    "dev": "tailwindcss -i ./css/input.css -o ./css/style.css --watch"
+  },
   "dependencies": {
-    "@tailwindcss/cli": "^4.2.2",
-    "tailwindcss": "^4.2.2"
+    "tailwindcss": "3"
   }
 }
