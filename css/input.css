@@ -1,5 +1,8 @@
 @import "tailwindcss";
 
+/* fix dark mode */
+@custom-variant dark (&:where(.dark, .dark *));
+
 @theme {
   /* Custom Colors: Sleek Dark & Vibrant Accents */
   --color-neon-blue: #00d2ff;
@@ -50,33 +53,33 @@
   :root {
     --accent-blue: #00d2ff;
     --accent-purple: #9d50bb;
+    --text-primary: #1a1b23;
+    --text-secondary: rgba(0, 0, 0, 0.6);
+  }
+
+  .dark {
     --text-primary: #ffffff;
     --text-secondary: rgba(255, 255, 255, 0.6);
   }
 
-  [data-theme="light"] {
-    --text-primary: #1a1a2e;
-    --text-secondary: #4a4a6a;
-    /* Light mode background is handled via Tailwind classes in HTML */
-  }
-
   * {
-    @apply transition-colors duration-300;
+    @apply transition-colors duration-300 border-black/5 dark:border-white/10;
   }
 
   body {
-    @apply bg-dark-primary text-white font-['Outfit',_sans-serif] min-h-screen flex items-center justify-center overflow-x-hidden p-4;
+    @apply bg-slate-50 text-slate-900 dark:bg-dark-primary dark:text-white font-['Outfit',sans-serif] min-h-screen flex items-center justify-center overflow-x-hidden p-4 transition-all;
   }
 }
 
 @layer components {
   /* Reusable Futuristic Components */
   .glass-card {
-    @apply bg-white/5 backdrop-blur-xl border border-white/10 rounded-3xl shadow-2xl p-8 w-full max-w-[420px] animate-fade-in-up;
+    @apply bg-white/70 backdrop-blur-xl border border-black/5 rounded-3xl shadow-2xl p-8 w-full max-w-sm md:max-w-2xl animate-fade-in-up
+           dark:bg-white/5 dark:border-white/10 dark:shadow-none;
   }
   
   .neon-btn {
-    @apply w-full py-4 bg-gradient-to-br from-neon-blue to-neon-purple text-white font-bold 
+    @apply w-full py-4 bg-linear-to-br from-neon-blue to-neon-purple text-white font-bold 
            rounded-xl shadow-[0_0_15px_rgba(0,210,255,0.4)] transition-all duration-300
            hover:scale-[1.02] hover:shadow-[0_0_25px_rgba(0,210,255,0.6)] active:scale-100
            flex items-center justify-center gap-2;
@@ -87,7 +90,7 @@
   }
 
   .input-label {
-    @apply block text-xs font-medium text-white/60 ml-1 uppercase tracking-wider;
+    @apply block text-xs font-semibold text-slate-500 dark:text-white/60 ml-1 uppercase tracking-wider;
   }
 
   .input-field-container {
@@ -95,39 +98,45 @@
   }
 
   .input-icon {
-    @apply absolute left-4 text-white/40;
+    @apply absolute left-4 text-slate-400 dark:text-white/40;
   }
 
   .input-field {
-    @apply w-full bg-white/5 border border-white/10 rounded-xl px-4 py-3 pl-12
-           text-white placeholder:text-white/30 outline-none transition-all
-           focus:border-neon-blue focus:bg-white/10 focus:ring-2 focus:ring-neon-blue/20;
+    @apply w-full bg-black/5 border border-black/5 rounded-xl px-4 py-3 pl-12
+           text-slate-900 placeholder:text-slate-400 outline-none transition-all
+           focus:border-neon-blue focus:bg-white focus:ring-2 focus:ring-neon-blue/20
+           dark:bg-white/5 dark:border-white/10 dark:text-white dark:placeholder:text-white/30 dark:focus:bg-white/10;
   }
 
   .stat-card {
-    @apply bg-white/5 border border-white/10 p-4 rounded-2xl;
+    @apply bg-black/5 border border-black/5 p-4 rounded-2xl dark:bg-white/5 dark:border-white/10;
   }
 
   .stat-label {
-    @apply text-[10px] text-white/50 uppercase tracking-widest flex items-center gap-1.5 mb-1;
+    @apply text-[10px] text-slate-500 dark:text-white/50 uppercase tracking-widest flex items-center gap-1.5 mb-1;
   }
 
   .stat-value {
-    @apply text-sm font-bold text-neon-blue;
+    @apply text-sm font-extrabold text-neon-blue;
   }
 }
 
 /* Background Animation */
 .bg-mesh {
-    @apply fixed inset-0 -z-10 pointer-events-none;
+    @apply fixed inset-0 -z-10 pointer-events-none transition-opacity duration-1000;
     background: radial-gradient(circle at 20% 30%, rgba(0, 210, 255, 0.1), transparent 40%),
                 radial-gradient(circle at 80% 70%, rgba(157, 80, 187, 0.1), transparent 40%);
 }
 
 .bg-mesh::before {
     content: '';
-    @apply absolute inset-0 opacity-10;
-    background-image: radial-gradient(circle at 2px 2px, rgba(255,255,255,0.2) 1px, transparent 0);
+    @apply absolute inset-0 opacity-20 dark:opacity-10;
+    background-image: radial-gradient(circle at 2px 2px, currentColor 1px, transparent 0);
     background-size: 40px 40px;
     mask-image: linear-gradient(to bottom, black, transparent);
+    color: rgba(0, 0, 0, 0.1);
+}
+
+.dark .bg-mesh::before {
+    color: rgba(255, 255, 255, 0.2);
 }

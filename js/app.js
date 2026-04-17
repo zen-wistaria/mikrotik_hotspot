@@ -2,22 +2,39 @@ document.addEventListener('DOMContentLoaded', () => {
     // Theme Management
     const initTheme = () => {
         const savedTheme = localStorage.getItem('hotspot-theme') || 'dark';
-        document.documentElement.setAttribute('data-theme', savedTheme);
+        document.documentElement.classList.toggle('dark', savedTheme === 'dark');
         updateThemeIcon(savedTheme);
+        updateBodyTheme(savedTheme);
     };
 
     const toggleTheme = () => {
-        const currentTheme = document.documentElement.getAttribute('data-theme');
-        const newTheme = currentTheme === 'dark' ? 'light' : 'dark';
-        document.documentElement.setAttribute('data-theme', newTheme);
+        const isDark = document.documentElement.classList.toggle('dark');
+        const newTheme = isDark ? 'dark' : 'light';
+
         localStorage.setItem('hotspot-theme', newTheme);
         updateThemeIcon(newTheme);
+        updateBodyTheme(newTheme);
+    };
+
+    const updateBodyTheme = (theme) => {
+        if (theme === 'light') {
+            document.body.classList.remove('bg-dark-primary', 'text-white');
+            document.body.classList.add('bg-slate-50', 'text-slate-900');
+        } else {
+            document.body.classList.add('bg-dark-primary', 'text-white');
+            document.body.classList.remove('bg-slate-50', 'text-slate-900');
+        }
     };
 
     const updateThemeIcon = (theme) => {
-        const icon = document.querySelector('.theme-toggle i');
-        if (icon) {
-            icon.className = theme === 'dark' ? 'fas fa-sun' : 'fas fa-moon';
+        const iconContainer = document.querySelector('.theme-toggle');
+        if (iconContainer) {
+            // Sun Icon for Dark Mode (to switch to light), Moon Icon for Light Mode (to switch to dark)
+            if (theme === 'dark') {
+                iconContainer.innerHTML = '<svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5 fill-current" viewBox="0 0 24 24"><path d="M12 7c-2.76 0-5 2.24-5 5s2.24 5 5 5 5-2.24 5-5-2.24-5-5-5zM2 13h2c.55 0 1-.45 1-1s-.45-1-1-1H2c-.55 0-1 .45-1 1s.45 1 1 1zm18 0h2c.55 0 1-.45 1-1s-.45-1-1-1h-2c-.55 0-1 .45-1 1s.45 1 1 1zM11 2v2c0 .55.45 1 1 1s1-.45 1-1V2c0-.55-.45-1-1-1s-1 .45-1 1zm0 18v2c0 .55.45 1 1 1s1-.45 1-1v-2c0-.55-.45-1-1-1s-1 .45-1 1zM5.99 4.58c-.39-.39-1.03-.39-1.41 0s-.39 1.03 0 1.41l1.06 1.06c.39.39 1.03.39 1.41 0s.39-1.03 0-1.41L5.99 4.58zm12.37 12.37c-.39-.39-1.03-.39-1.41 0s-.39 1.03 0 1.41l1.06 1.06c.39.39 1.03.39 1.41 0s.39-1.03 0-1.41l-1.06-1.06zm1.06-12.37c-.39-.39-1.03-.39-1.41 0l-1.06 1.06c-.39.39-.39 1.03 0 1.41s1.03.39 1.41 0l1.06-1.06c.39-.38.39-1.02 0-1.41zm-12.37 12.37c-.39-.39-1.03-.39-1.41 0l-1.06 1.06c-.39.39-.39 1.03 0 1.41s1.03.39 1.41 0l1.06-1.06c.38-.38.38-1.02 0-1.41z"/></svg>';
+            } else {
+                iconContainer.innerHTML = '<svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5 fill-current" viewBox="0 0 24 24"><path d="M12.12 22a10 10 0 0 1-7.143-3.047A10.11 10.11 0 0 1 2.25 12c0-5.561 4.506-10.035 10.04-10.035a9.91 9.91 0 0 1 7.074 2.935 1 1 0 0 1-.26 1.564 8.01 8.01 0 0 0-4.321 13.9 1 1 0 0 1 .42 1.43 9.94 9.94 0 0 1-3.083 2.136c-.328.14-.678.188-1 .188l-.001.011z"/></svg>';
+            }
         }
     };
 
@@ -27,38 +44,44 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // Tab Management (Member vs Voucher)
     const tabBtns = document.querySelectorAll('.tab-btn');
-    const loginForm = document.querySelector('form[name="login"]');
     const passwordGroup = document.getElementById('password-group');
     const usernameLabel = document.getElementById('username-label');
-    const loginTypeInput = document.getElementById('login-type'); // Hidden input if we want to track state
+    const usernameInput = document.querySelector('input[name="username"]');
 
     if (tabBtns.length > 0) {
         tabBtns.forEach(btn => {
             btn.addEventListener('click', () => {
-                tabBtns.forEach(b => b.classList.remove('active'));
+                tabBtns.forEach(b => {
+                    b.classList.remove('active');
+                    b.setAttribute('data-active', 'false');
+                });
                 btn.classList.add('active');
+                btn.setAttribute('data-active', 'true');
                 
                 const type = btn.getAttribute('data-type');
                 if (type === 'voucher') {
-                    passwordGroup.style.display = 'none';
-                    usernameLabel.textContent = 'Voucher Code';
-                    document.login.username.placeholder = 'Enter Voucher Code';
+                    if (passwordGroup) passwordGroup.style.display = 'none';
+                    if (usernameLabel) usernameLabel.textContent = 'Voucher Code';
+                    if (usernameInput) usernameInput.placeholder = 'Enter Voucher Code';
                 } else {
-                    passwordGroup.style.display = 'block';
-                    usernameLabel.textContent = 'Username';
-                    document.login.username.placeholder = 'Enter Username';
+                    if (passwordGroup) passwordGroup.style.display = 'block';
+                    if (usernameLabel) usernameLabel.textContent = 'Username';
+                    if (usernameInput) usernameInput.placeholder = 'Enter Username';
                 }
             });
         });
     }
 
-    // Loading State
+    // Loading State & Login Prep
+    const loginForm = document.querySelector('form[name="login"]');
     if (loginForm) {
         loginForm.addEventListener('submit', () => {
             const activeTab = document.querySelector('.tab-btn.active');
             if (activeTab && activeTab.getAttribute('data-type') === 'voucher') {
                 // For Voucher: copy username to password
-                document.login.password.value = document.login.username.value;
+                const passInput = loginForm.querySelector('input[name="password"]');
+                const userVal = loginForm.querySelector('input[name="username"]').value;
+                if (passInput) passInput.value = userVal;
             }
             
             const loader = document.getElementById('loader');
@@ -86,7 +109,6 @@ function parseUptime(uptimeStr) {
                (parseInt(parts[2]) || 0) * 3600 +
                (parseInt(parts[3]) || 0) * 86400;
     }
-    // Handle days, hours, minutes, seconds format (1d2h3m4s)
     let totalSeconds = 0;
     const days = uptimeStr.match(/(\d+)d/);
     const hours = uptimeStr.match(/(\d+)h/);
@@ -114,3 +136,4 @@ function formatUptime(seconds) {
     res += (s < 10 ? "0" + s : s);
     return res;
 }
+

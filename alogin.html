@@ -6,9 +6,8 @@
     <meta http-equiv="refresh" content="2; url=$(link-orig)">
     <meta http-equiv="pragma" content="no-cache">
     <meta http-equiv="expires" content="-1">
-    <title>Futuristic Hotspot - Redirecting</title>
+    <title>WiFi | Redirecting</title>
     <link rel="stylesheet" href="css/style.css">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <script>
         function doRedirect() {
             window.location.href = "$(link-orig)";
@@ -16,34 +15,30 @@
     </script>
 </head>
 
-<body onLoad="setTimeout(doRedirect, 2000)">
-    <div class="bg-animation"></div>
+<body class="bg-slate-50 text-slate-900 dark:bg-dark-primary dark:text-white font-['Outfit',sans-serif] min-h-screen flex items-center justify-center overflow-x-hidden p-4 transition-all" onLoad="setTimeout(doRedirect, 2000)">
+    <div class="bg-mesh"></div>
 
-    <div class="glass-card" style="text-align: center;">
-        <div style="font-size: 4rem; margin-bottom: 30px; animation: glowPulse 2s infinite;">
-            <i class="fas fa-circle-check" style="color: #00ff88;"></i>
+    <div class="glass-card text-center">
+        <div class="w-16 h-16 bg-green-500/10 border border-green-500/20 rounded-full flex items-center justify-center mx-auto mb-6 animate-glow-pulse">
+            <svg xmlns="http://www.w3.org/2000/svg" class="w-10 h-10 text-green-500" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>
         </div>
         
-        <div class="header">
-            <h1>ACCESS GRANTED</h1>
-            <p>Authentication successful. You are being redirected to your destination.</p>
+        <div class="mb-8">
+            <h1 class="text-2xl font-extrabold tracking-tight bg-linear-to-r from-neon-blue to-green-400 bg-clip-text text-transparent uppercase italic">Access Granted</h1>
+            <p class="text-[10px] text-slate-400 dark:text-white/40 mt-1 uppercase tracking-widest leading-relaxed">Authentication successful. Initializing secure tunnel...</p>
         </div>
 
-        <div style="margin: 30px 0;">
-            <div class="spinner" style="margin: 0 auto;"></div>
+        <div class="flex justify-center mb-8">
+            <div class="w-10 h-10 border-2 border-black/5 dark:border-white/5 border-t-neon-blue rounded-full animate-spin"></div>
         </div>
 
-        <p style="color: var(--text-secondary); font-size: 0.85rem;">
-            If you are not redirected, <a href="$(link-orig)" style="color: var(--accent-blue); text-decoration: none; font-weight: 600;">click here</a>
+        <p class="text-[10px] text-slate-400 dark:text-white/30 uppercase tracking-[0.15em]">
+            If you are not redirected, <a href="$(link-orig)" class="text-neon-blue font-bold border-b border-neon-blue/20 hover:border-neon-blue transition-all">click here</a>
         </p>
-
-        <style>
-            @keyframes glowPulse {
-                0% { filter: drop-shadow(0 0 5px rgba(0, 255, 136, 0.4)); }
-                50% { filter: drop-shadow(0 0 20px rgba(0, 255, 136, 0.8)); }
-                100% { filter: drop-shadow(0 0 5px rgba(0, 255, 136, 0.4)); }
-            }
-        </style>
     </div>
+
+    <script src="js/app.js"></script>
 </body>
 </html>
+
+

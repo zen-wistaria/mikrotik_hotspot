@@ -5,43 +5,43 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta http-equiv="pragma" content="no-cache">
     <meta http-equiv="expires" content="-1">
-    <title>Futuristic Hotspot - Logged Out</title>
+    <title>WiFi | Logged Out</title>
     <link rel="stylesheet" href="css/style.css">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 </head>
 
-<body>
-    <div class="bg-animation"></div>
+<body class="bg-slate-50 text-slate-900 dark:bg-dark-primary dark:text-white font-['Outfit',sans-serif] min-h-screen flex items-center justify-center overflow-x-hidden p-4 transition-all">
+    <div class="bg-mesh"></div>
 
     <div class="glass-card">
-        <div class="header">
-            <div style="font-size: 3rem; margin-bottom: 20px;">
-                <i class="fas fa-shield-halved" style="color: var(--accent-purple);"></i>
+        <div class="text-center mb-8">
+            <div class="w-16 h-16 bg-neon-purple/10 border border-neon-purple/20 rounded-2xl flex items-center justify-center mx-auto mb-4 animate-float">
+                <svg xmlns="http://www.w3.org/2000/svg" class="w-8 h-8 text-neon-purple" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
             </div>
-            <h1>SESSION CLOSED</h1>
-            <p>You have been safely disconnected from the network</p>
+            <h1 class="text-2xl font-extrabold tracking-tight bg-linear-to-r from-neon-blue to-neon-purple bg-clip-text text-transparent uppercase italic">Session Closed</h1>
+            <p class="text-[10px] text-slate-400 dark:text-white/40 mt-1 uppercase tracking-widest leading-relaxed">Protocol terminated for <span class="text-slate-900 dark:text-white font-bold">$(username)</span></p>
         </div>
 
-        <div class="dashboard-grid">
+        <div class="grid grid-cols-2 gap-3 mb-8">
             <div class="stat-card">
-                <div class="label">USER</div>
-                <div class="value">$(username)</div>
+                <div class="stat-label">User</div>
+                <div class="stat-value">$(username)</div>
             </div>
             <div class="stat-card">
-                <div class="label">FINAL UPTIME</div>
-                <div class="value">$(uptime)</div>
+                <div class="stat-label">Uptime</div>
+                <div class="stat-value">$(uptime)</div>
             </div>
-            <div class="stat-card full-width">
-                <div class="label">TOTAL DATA TRANSFERRED</div>
-                <div class="value">$(bytes-in-nice) / $(bytes-out-nice)</div>
+            <div class="stat-card col-span-2">
+                <div class="stat-label text-center">Data Consumed (Up/Down)</div>
+                <div class="stat-value text-center tracking-tight">$(bytes-in-nice) / $(bytes-out-nice)</div>
             </div>
         </div>
 
-        <button class="btn-primary" onclick="document.location='$(link-login)'">
-            RETURN TO LOGIN <i class="fas fa-rotate-left" style="margin-left: 10px;"></i>
+        <button class="neon-btn group uppercase tracking-widest text-sm italic" onclick="document.location='$(link-login)'">
+            Return to Login
+            <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4 transition-transform group-hover:-rotate-45" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12a9 9 0 1 1-6.219-8.56"/><path d="M22 2 11 13"/><path d="M22 10V2h-8"/></svg>
         </button>
 
-        <div style="text-align: center; margin-top: 25px; font-size: 0.8rem; color: var(--text-secondary); opacity: 0.7;">
+        <div class="text-center mt-8 text-[10px] text-slate-400 dark:text-white/30 uppercase tracking-[0.2em]">
             Secure Logout Protocol Complete
         </div>
     </div>
@@ -49,3 +49,5 @@
     <script src="js/app.js"></script>
 </body>
 </html>
+
+
