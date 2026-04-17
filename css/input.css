@@ -1,0 +1,133 @@
+@import "tailwindcss";
+
+@theme {
+  /* Custom Colors: Sleek Dark & Vibrant Accents */
+  --color-neon-blue: #00d2ff;
+  --color-neon-purple: #9d50bb;
+  --color-dark-primary: #0a0b10;
+  --color-dark-secondary: #1a1b23;
+  --color-glass-white: rgba(255, 255, 255, 0.05);
+  --color-glass-border: rgba(255, 255, 255, 0.1);
+  
+  /* Custom Animations */
+  --animate-glow-pulse: glowPulse 2s infinite ease-in-out;
+  --animate-fade-in-up: fadeInUp 0.6s cubic-bezier(0.16, 1, 0.3, 1);
+  --animate-float: float 6s ease-in-out infinite;
+
+  @keyframes glowPulse {
+    0%, 100% { filter: drop-shadow(0 0 5px rgba(0, 210, 255, 0.4)); }
+    50% { filter: drop-shadow(0 0 15px rgba(0, 210, 255, 0.8)); }
+  }
+
+  @keyframes fadeInUp {
+    from { opacity: 0; transform: translateY(20px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+
+  @keyframes float {
+    0%, 100% { transform: translateY(0); }
+    50% { transform: translateY(-10px); }
+  }
+}
+
+@layer base {
+  /* Local Font Setup */
+  @font-face {
+    font-family: 'Outfit';
+    src: url('../fonts/outfit-regular.woff2') format('woff2');
+    font-weight: 400;
+    font-style: normal;
+    font-display: swap;
+  }
+  @font-face {
+    font-family: 'Outfit';
+    src: url('../fonts/outfit-bold.woff2') format('woff2');
+    font-weight: 700;
+    font-style: normal;
+    font-display: swap;
+  }
+
+  :root {
+    --accent-blue: #00d2ff;
+    --accent-purple: #9d50bb;
+    --text-primary: #ffffff;
+    --text-secondary: rgba(255, 255, 255, 0.6);
+  }
+
+  [data-theme="light"] {
+    --text-primary: #1a1a2e;
+    --text-secondary: #4a4a6a;
+    /* Light mode background is handled via Tailwind classes in HTML */
+  }
+
+  * {
+    @apply transition-colors duration-300;
+  }
+
+  body {
+    @apply bg-dark-primary text-white font-['Outfit',_sans-serif] min-h-screen flex items-center justify-center overflow-x-hidden p-4;
+  }
+}
+
+@layer components {
+  /* Reusable Futuristic Components */
+  .glass-card {
+    @apply bg-white/5 backdrop-blur-xl border border-white/10 rounded-3xl shadow-2xl p-8 w-full max-w-[420px] animate-fade-in-up;
+  }
+  
+  .neon-btn {
+    @apply w-full py-4 bg-gradient-to-br from-neon-blue to-neon-purple text-white font-bold 
+           rounded-xl shadow-[0_0_15px_rgba(0,210,255,0.4)] transition-all duration-300
+           hover:scale-[1.02] hover:shadow-[0_0_25px_rgba(0,210,255,0.6)] active:scale-100
+           flex items-center justify-center gap-2;
+  }
+  
+  .input-group {
+    @apply mb-5 space-y-2;
+  }
+
+  .input-label {
+    @apply block text-xs font-medium text-white/60 ml-1 uppercase tracking-wider;
+  }
+
+  .input-field-container {
+    @apply relative flex items-center;
+  }
+
+  .input-icon {
+    @apply absolute left-4 text-white/40;
+  }
+
+  .input-field {
+    @apply w-full bg-white/5 border border-white/10 rounded-xl px-4 py-3 pl-12
+           text-white placeholder:text-white/30 outline-none transition-all
+           focus:border-neon-blue focus:bg-white/10 focus:ring-2 focus:ring-neon-blue/20;
+  }
+
+  .stat-card {
+    @apply bg-white/5 border border-white/10 p-4 rounded-2xl;
+  }
+
+  .stat-label {
+    @apply text-[10px] text-white/50 uppercase tracking-widest flex items-center gap-1.5 mb-1;
+  }
+
+  .stat-value {
+    @apply text-sm font-bold text-neon-blue;
+  }
+}
+
+/* Background Animation */
+.bg-mesh {
+    @apply fixed inset-0 -z-10 pointer-events-none;
+    background: radial-gradient(circle at 20% 30%, rgba(0, 210, 255, 0.1), transparent 40%),
+                radial-gradient(circle at 80% 70%, rgba(157, 80, 187, 0.1), transparent 40%);
+}
+
+.bg-mesh::before {
+    content: '';
+    @apply absolute inset-0 opacity-10;
+    background-image: radial-gradient(circle at 2px 2px, rgba(255,255,255,0.2) 1px, transparent 0);
+    background-size: 40px 40px;
+    mask-image: linear-gradient(to bottom, black, transparent);
+}
