@@ -81,7 +81,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const tabBtns = document.querySelectorAll('.tab-btn');
     const passwordGroup = document.getElementById('password-group');
     const usernameLabel = document.getElementById('username-label');
-    const usernameInput = document.querySelector('input[name="username"]');
+    const usernameInput = document.querySelector('input[name="username"].input-field');
 
     if (tabBtns.length > 0) {
         tabBtns.forEach(btn => {
