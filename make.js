@@ -6,7 +6,7 @@ const outDir = path.join(root, 'results');
 
 // file & folder to copy
 const items = [
-  'ads.html',
+  'trials.html',
   'alogin.html',
   'api.json',
   'css',
