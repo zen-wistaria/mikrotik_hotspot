@@ -1,10 +1,9 @@
 const fs = require('fs');
 const path = require('path');
 
-const root = __dirname;
-const outDir = path.join(root, 'results');
+const srcDir = path.join(__dirname, 'src');
+const outDir = path.join(__dirname, 'results');
 
-// file & folder to copy
 const items = [
   'css',
   'img',
@@ -26,8 +25,21 @@ const items = [
   'rlogin.html',
   'rstatus.html',
   'status.html',
-  'trials.html'
+  'trials.html',
+  // exclude
+  '!css/input.css',
+  '!js/dev-only.js'
 ];
+
+const includeItems = items.filter(i => !i.startsWith('!'));
+const excludeItems = items
+  .filter(i => i.startsWith('!'))
+  .map(i => i.slice(1));
+
+// normalize to absolute path
+const excludePaths = excludeItems.map(p =>
+  path.join(srcDir, p)
+);
 
 // remove old results folder
 if (fs.existsSync(outDir)) {
@@ -37,12 +49,25 @@ if (fs.existsSync(outDir)) {
 // create new results folder
 fs.mkdirSync(outDir, { recursive: true });
 
-// helper copy
+// cek apakah file harus di-exclude
+function isExcluded(srcPath) {
+  return excludePaths.some(ex =>
+    srcPath.startsWith(ex)
+  );
+}
+
+// helper copy recursive
 function copyRecursive(src, dest) {
+  if (isExcluded(src)) {
+    console.log(`skipped: ${path.relative(srcDir, src)}`);
+    return;
+  }
+
   const stat = fs.statSync(src);
 
   if (stat.isDirectory()) {
     fs.mkdirSync(dest, { recursive: true });
+
     fs.readdirSync(src).forEach(file => {
       copyRecursive(
         path.join(src, file),
@@ -55,8 +80,8 @@ function copyRecursive(src, dest) {
 }
 
 // proses copy
-items.forEach(item => {
-  const srcPath = path.join(root, item);
+includeItems.forEach(item => {
+  const srcPath = path.join(srcDir, item);
   const destPath = path.join(outDir, item);
 
   if (fs.existsSync(srcPath)) {

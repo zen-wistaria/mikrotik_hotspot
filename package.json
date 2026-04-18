@@ -2,8 +2,9 @@
   "name": "hotspot_futuristic",
   "private": true,
   "scripts": {
-    "dev": "tailwindcss -i ./css/input.css -o ./css/style.css --watch",
-    "make": "node make.js"
+    "dev": "tailwindcss -i ./src/css/input.css -o ./src/css/style.css --watch",
+    "exports": "node exports.js",
+    "build": "node exports.js && tailwindcss -i ./src/css/input.css -o ./results/css/style.css --minify"
   },
   "dependencies": {
     "tailwindcss": "3"

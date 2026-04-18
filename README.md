@@ -44,8 +44,8 @@ npm run dev
 ### Build
 
 ```bash
-bun make
+bun run build
 # or
-npm run make
+npm run build
 ```
 the result will be in the `results` folder. you can copy it to your mikrotik.
