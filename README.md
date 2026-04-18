@@ -1,15 +1,30 @@
-# hotspot_futuristic
+# Mikrotik Hotspot Template
 
-To install dependencies:
+A futuristic Mikrotik Hotspot template built using Tailwind CSS.
+
+### Requirement
+- Node or Bun
+
+### Setup dev
 
 ```bash
 bun install
+# or
+npm install
 ```
-
-To run:
+### Start dev
 
 ```bash
-bun run 
+bun dev 
+# or
+npm run dev
 ```
 
-This project was created using `bun init` in bun v1.2.3. [Bun](https://bun.sh) is a fast all-in-one JavaScript runtime.
+### Build
+
+```bash
+bun make
+# or
+npm run make
+```
+the result will be in the `results` folder. you can copy it to your mikrotik.
