@@ -8,7 +8,8 @@
   },
   "private": true,
   "scripts": {
-    "dev": "tailwindcss -i ./css/input.css -o ./css/style.css --watch"
+    "dev": "tailwindcss -i ./css/input.css -o ./css/style.css --watch",
+    "make": "node make.js"
   },
   "dependencies": {
     "tailwindcss": "3"
