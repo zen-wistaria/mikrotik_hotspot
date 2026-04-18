@@ -1,11 +1,5 @@
 {
   "name": "hotspot_futuristic",
-  "devDependencies": {
-    "@types/bun": "latest"
-  },
-  "peerDependencies": {
-    "typescript": "^5"
-  },
   "private": true,
   "scripts": {
     "dev": "tailwindcss -i ./css/input.css -o ./css/style.css --watch",
