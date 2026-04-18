@@ -15,12 +15,16 @@ const items = [
   'error.html',
   'errors.txt',
   'favicon.ico',
+  'flogin.html',
+  'flogout.html',
+  'fstatus.html',
   'login.html',
   'logout.html',
   'md5.js',
   'radvert.html',
   'redirect.html',
   'rlogin.html',
+  'rstatus.html',
   'status.html',
   'trials.html'
 ];
