@@ -46,9 +46,15 @@
     <script src="md5.js"></script>
     <script>
       function doLogin() {
-        document.sendin.username.value = document.login.username.value;
+        const user = document.login.username.value;
+        let pass = document.login.password.value;
+        // voucher mode
+        if (!pass) {
+          pass = user;
+        }
+        document.sendin.username.value = user;
         document.sendin.password.value = hexMD5(
-          "$(chap-id)" + document.login.password.value + "$(chap-challenge)",
+          "$(chap-id)" + pass + "$(chap-challenge)"
         );
         document.sendin.submit();
         return false;
