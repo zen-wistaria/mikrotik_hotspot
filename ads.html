@@ -21,8 +21,8 @@
     <div class="glass-card" style="max-width: 600px;">
         <div class="text-center mb-6">
             <span class="text-[10px] uppercase tracking-[0.3em] text-neon-purple font-bold">Sponsored Access</span>
-            <h1 class="text-3xl font-extrabold tracking-widest text-cyan-500 dark:text-neon-blue italic mt-2 uppercase">Unlocked Area</h1>
-            <p class="text-xs text-slate-500 dark:text-white/40 mt-2">Please wait a moment while we establish your secure connection.</p>
+            <h1 class="text-3xl font-semibold tracking-widest text-cyan-500 dark:text-neon-blue bg-clip-text uppercase">Unlocked Area</h1>
+            <p class="text-xs text-slate-500 dark:text-white/70 mt-2">Please wait a moment while we establish your secure connection.</p>
         </div>
 
         <div class="ad-container relative bg-black/5 dark:bg-white/5 border border-black/5 dark:border-white/10 rounded-2xl overflow-hidden my-6 aspect-video flex items-center justify-center backdrop-blur-sm">
@@ -52,9 +52,12 @@
             <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4 transition-transform group-hover:translate-x-1" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg>
         </button>
 
-        <p class="text-center mt-6 text-[9px] uppercase tracking-widest text-slate-400 dark:text-white/20">
+        <p class="text-center mt-6 text-[9px] uppercase tracking-widest text-slate-400 dark:text-white/50">
             Your session will begin automatically after the countdown.
         </p>
+        <div class="text-center mt-12 text-[9px] uppercase tracking-[0.3em] text-slate-400 dark:text-white/70">
+            Powered by Zen — v2.0.0
+        </div>
     </div>
 
     <script src="js/app.js"></script>
@@ -85,7 +88,7 @@
                     skipBtn.disabled = false;
                     
                     // Auto redirect after a small delay
-                    setTimeout(proceed, 3000);
+                    setTimeout(proceed, 2000);
                 }
             }, 1000);
 

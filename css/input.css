@@ -73,7 +73,7 @@
   }
 
   .input-icon {
-    @apply absolute left-4 text-slate-400 dark:text-white/40;
+    @apply absolute left-4 text-slate-400 dark:text-white/70;
   }
 
   .input-field {
