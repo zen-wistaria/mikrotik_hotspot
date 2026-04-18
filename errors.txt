@@ -74,6 +74,14 @@ chap-missing = web browser did not send challenge response (try again, enable Ja
 
 invalid-username = invalid username or password
 
+# otp-already-used
+# OTP token changes every 30 seconds.
+# In case of rapid login/logout/login it is possible to get same OTP token,
+# which will not be allowed for security reasons.
+# User has to wait (up to 30s) for token to change and then try again.
+
+otp-already-used = this OTP token is already used
+
 # invalid-mac
 # Local users (on hotspot server) can be bound to some MAC address. If login
 # from different MAC is tried, this error message will be shown.

@@ -554,30 +554,6 @@ video {
   display: none;
 }
 
-@font-face {
-  font-family: 'Outfit';
-
-  src: url('../fonts/outfit-regular.woff2') format('woff2');
-
-  font-weight: 400;
-
-  font-style: normal;
-
-  font-display: swap;
-}
-
-@font-face {
-  font-family: 'Outfit';
-
-  src: url('../fonts/outfit-bold.woff2') format('woff2');
-
-  font-weight: 700;
-
-  font-style: normal;
-
-  font-display: swap;
-}
-
 :root {
   --accent-blue: #00d2ff;
   --accent-purple: #9d50bb;
@@ -737,7 +713,7 @@ body:is(.dark *) {
 }
 
 .input-icon:is(.dark *) {
-  color: rgb(255 255 255 / 0.7);
+  color: rgb(255 255 255 / 0.4);
 }
 
 .input-field {

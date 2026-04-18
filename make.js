@@ -6,15 +6,15 @@ const outDir = path.join(root, 'results');
 
 // file & folder to copy
 const items = [
-  'trials.html',
+  'css',
+  'img',
+  'js',
+  'xml',
   'alogin.html',
   'api.json',
-  'css',
   'error.html',
   'errors.txt',
   'favicon.ico',
-  'img',
-  'js',
   'login.html',
   'logout.html',
   'md5.js',
@@ -22,7 +22,7 @@ const items = [
   'redirect.html',
   'rlogin.html',
   'status.html',
-  'xml',
+  'trials.html'
 ];
 
 // remove old results folder

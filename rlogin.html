@@ -1,7 +1,7 @@
 $(if http-status == 302)Hotspot login required$(endif)
 $(if http-header == "Location")$(link-redirect)$(endif)
 <html>
-  <!--
+<!--
 <?xml version="1.0" encoding="UTF-8"?>
   <WISPAccessGatewayParam
   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
@@ -16,11 +16,12 @@ $(if http-header == "Location")$(link-redirect)$(endif)
     </Redirect>
   </WISPAccessGatewayParam>
 -->
-  <head>
-    <title>...</title>
-    <meta http-equiv="refresh" content="0; url=$(link-redirect)" />
-    <meta http-equiv="pragma" content="no-cache" />
-    <meta http-equiv="expires" content="-1" />
-  </head>
-  <body></body>
+<head>
+<title>...</title>
+<meta http-equiv="refresh" content="0; url=$(link-redirect)">
+<meta http-equiv="pragma" content="no-cache">
+<meta http-equiv="expires" content="-1">
+</head>
+<body>
+</body>
 </html>
