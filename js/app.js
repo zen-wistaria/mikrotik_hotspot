@@ -124,14 +124,14 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     // Session Timer (Status Page)
-    const uptimeElement = document.getElementById('uptime');
-    if (uptimeElement) {
-        let seconds = parseUptime(uptimeElement.getAttribute('data-uptime') || '0s');
-        setInterval(() => {
-            seconds++;
-            uptimeElement.textContent = formatUptime(seconds);
-        }, 1000);
-    }
+    // const uptimeElement = document.getElementById('uptime');
+    // if (uptimeElement) {
+    //     let seconds = parseUptime(uptimeElement.getAttribute('data-uptime') || '0s');
+    //     setInterval(() => {
+    //         seconds++;
+    //         uptimeElement.textContent = formatUptime(seconds);
+    //     }, 1000);
+    // }
 });
 
 function parseUptime(uptimeStr) {
