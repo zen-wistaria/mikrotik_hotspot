@@ -95,7 +95,10 @@ document.addEventListener('DOMContentLoaded', () => {
                 
                 const type = btn.getAttribute('data-type');
                 if (type === 'voucher') {
-                    if (passwordGroup) passwordGroup.style.display = 'none';
+                    if (passwordGroup) {
+                      passwordGroup.style.display = 'none';
+                      passwordGroup.querySelector("input").value = "";
+                    }
                     if (usernameLabel) usernameLabel.textContent = 'Voucher Code';
                     if (usernameInput) usernameInput.placeholder = 'Enter Voucher Code';
                 } else {
