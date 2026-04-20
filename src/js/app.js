@@ -71,7 +71,10 @@ document.addEventListener("DOMContentLoaded", () => {
           if (usernameLabel) usernameLabel.textContent = "Username";
           if (usernameInput) usernameInput.placeholder = "Enter Username";
         } else {
-          if (passwordGroup) passwordGroup.style.display = "none";
+          if (passwordGroup) {
+            passwordGroup.style.display = "none";
+            passwordGroup.querySelector("input").value = "";
+          }
           if (usernameLabel) usernameLabel.textContent = "Voucher Code";
           if (usernameInput) usernameInput.placeholder = "Enter Voucher Code";
         }
