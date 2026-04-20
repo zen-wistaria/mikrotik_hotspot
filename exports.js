@@ -1,5 +1,6 @@
 const fs = require('fs');
 const path = require('path');
+const { minify } = require('html-minifier-terser');
 
 const srcDir = path.join(__dirname, 'src');
 const outDir = path.join(__dirname, 'results');
@@ -26,7 +27,6 @@ const items = [
   'rstatus.html',
   'status.html',
   'trials.html',
-  // exclude
   '!css/input.css',
   '!js/dev-only.js'
 ];
@@ -36,28 +36,23 @@ const excludeItems = items
   .filter(i => i.startsWith('!'))
   .map(i => i.slice(1));
 
-// normalize to absolute path
 const excludePaths = excludeItems.map(p =>
   path.join(srcDir, p)
 );
 
-// remove old results folder
 if (fs.existsSync(outDir)) {
   fs.rmSync(outDir, { recursive: true, force: true });
 }
 
-// create new results folder
 fs.mkdirSync(outDir, { recursive: true });
 
-// cek apakah file harus di-exclude
 function isExcluded(srcPath) {
   return excludePaths.some(ex =>
     srcPath.startsWith(ex)
   );
 }
 
-// helper copy recursive
-function copyRecursive(src, dest) {
+async function copyRecursive(src, dest) {
   if (isExcluded(src)) {
     console.log(`skipped: ${path.relative(srcDir, src)}`);
     return;
@@ -68,28 +63,47 @@ function copyRecursive(src, dest) {
   if (stat.isDirectory()) {
     fs.mkdirSync(dest, { recursive: true });
 
-    fs.readdirSync(src).forEach(file => {
-      copyRecursive(
+    for (const file of fs.readdirSync(src)) {
+      await copyRecursive(
         path.join(src, file),
         path.join(dest, file)
       );
-    });
+    }
   } else {
-    fs.copyFileSync(src, dest);
+    // Minify HTML Only
+    if (src.endsWith('.html')) {
+      let content = fs.readFileSync(src, 'utf-8');
+
+      const minified = await minify(content, {
+        collapseWhitespace: true,
+        removeComments: true,
+
+        // for Mikrotik
+        removeAttributeQuotes: false,
+        minifyJS: true,
+        minifyCSS: true,
+        ignoreCustomFragments: [/\$\([^\)]+\)/] // ignore $(...)
+      });
+
+      fs.writeFileSync(dest, minified);
+    } else {
+      fs.copyFileSync(src, dest);
+    }
   }
 }
 
-// proses copy
-includeItems.forEach(item => {
-  const srcPath = path.join(srcDir, item);
-  const destPath = path.join(outDir, item);
+(async () => {
+  for (const item of includeItems) {
+    const srcPath = path.join(srcDir, item);
+    const destPath = path.join(outDir, item);
 
-  if (fs.existsSync(srcPath)) {
-    copyRecursive(srcPath, destPath);
-    console.log(`✔ copied: ${item}`);
-  } else {
-    console.warn(`⚠ not found: ${item}`);
+    if (fs.existsSync(srcPath)) {
+      await copyRecursive(srcPath, destPath);
+      console.log(`✔ copied: ${item}`);
+    } else {
+      console.warn(`⚠ not found: ${item}`);
+    }
   }
-});
 
-console.log('\nBuild done → folder "results" ready 🚀');
+  console.log('\nBuild done → folder "results" ready 🚀');
+})();
