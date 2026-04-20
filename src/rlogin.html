@@ -1,7 +1,7 @@
-$(if http-status == 302)Hotspot login required$(endif)
-$(if http-header == "Location")$(link-redirect)$(endif)
+$(if http-status == 302)Hotspot login required$(endif) $(if http-header ==
+"Location")$(link-redirect)$(endif)
 <!doctype html>
-<html lang="en">
+<html lang="id">
   <!--
   <?xml version="1.0" encoding="UTF-8"?>
     <WISPAccessGatewayParam
@@ -23,7 +23,7 @@ $(if http-header == "Location")$(link-redirect)$(endif)
     <meta http-equiv="pragma" content="no-cache" />
     <meta http-equiv="expires" content="-1" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>WiFi | Redirecting</title>
+    <title>Arnet-ID | Redirecting</title>
     <link rel="stylesheet" href="css/style.css" />
   </head>
 
@@ -72,11 +72,11 @@ $(if http-header == "Location")$(link-redirect)$(endif)
         </div>
         <h1
           class="text-3xl font-semibold tracking-widest text-cyan-500 dark:text-neon-blue bg-clip-text uppercase">
-          Redirecting
+          Mengarahkan
         </h1>
         <p
           class="text-[10px] text-slate-400 dark:text-white/70 mt-1 uppercase tracking-widest leading-relaxed">
-          Authentication required. Sending you to the login portal...
+          Autentikasi diperlukan. Mengarahkan Anda ke portal login...
         </p>
       </div>
 
@@ -87,11 +87,11 @@ $(if http-header == "Location")$(link-redirect)$(endif)
 
       <div
         class="bg-black/5 dark:bg-white/5 p-4 rounded-xl text-[10px] text-slate-500 dark:text-white/60 mb-8 text-center leading-relaxed italic">
-        If you are not redirected automatically, please
+        Jika Anda tidak diarahkan secara otomatis, silakan
         <a
           href="$(link-redirect)"
           class="text-cyan-500 dark:text-neon-blue font-bold hover:underline"
-          >click here</a
+          >klik di sini</a
         >.
       </div>
 

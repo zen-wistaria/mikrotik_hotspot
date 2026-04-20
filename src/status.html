@@ -1,4 +1,4 @@
-<html lang="en">
+<html lang="id">
   <head>
     $(if refresh-timeout)
     <meta http-equiv="refresh" content="$(refresh-timeout-secs)" />
@@ -7,7 +7,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <meta http-equiv="pragma" content="no-cache" />
     <meta http-equiv="expires" content="-1" />
-    <title>WiFi | Status</title>
+    <title>Arnet-ID | Status</title>
     <link rel="stylesheet" href="css/style.css" />
     <script>
       $(if advert-pending == 'yes')
@@ -65,12 +65,13 @@
         </div>
         <h1
           class="text-3xl font-semibold tracking-widest text-cyan-500 dark:text-neon-blue bg-clip-text uppercase">
-          System Active
+          Sistem Aktif
         </h1>
         <p
           class="text-[10px] text-slate-400 dark:text-white/70 mt-1 uppercase tracking-widest">
-          Protocol Secured for <br />
-          <span class="text-slate-900 dark:text-white font-bold text-sm md:text-md"
+          ID Member <br />
+          <span
+            class="text-slate-900 dark:text-white font-bold text-md md:text-lg"
             >$(username)</span
           >
         </p>
@@ -147,10 +148,10 @@
               <path d="M4.93 19.07l2.83-2.83" />
               <path d="M16.24 7.76l2.83-2.83" />
             </svg>
-            Remaining
+            Sisa Waktu
           </div>
           <div class="stat-value">
-            $(if session-time-left)$(session-time-left)$(else)∞$(endif)
+            $(if session-time-left)$(session-time-left)$(else)Unlimited$(endif)
           </div>
         </div>
         <div class="stat-card col-span-2">
@@ -203,7 +204,7 @@
         <button
           type="submit"
           class="neon-btn uppercase tracking-widest text-sm italic">
-          Terminate Session
+          Logout
           <svg
             xmlns="http://www.w3.org/2000/svg"
             class="w-4 h-4"
