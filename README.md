@@ -35,6 +35,14 @@ npm install
 ```
 ### Start dev
 
+**generate config first**
+``` bash
+bun genconfig
+# or
+npm run genconfig
+```
+
+**start dev server**
 ```bash
 bun dev 
 # or
