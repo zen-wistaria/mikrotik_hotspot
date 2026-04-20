@@ -7,7 +7,8 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <meta http-equiv="pragma" content="no-cache" />
     <meta http-equiv="expires" content="-1" />
-    <title>WiFi | Status</title>
+    <title>@config('status.meta.title')</title>
+    <meta name="description" content="@config('status.meta.description')">
     <link rel="stylesheet" href="css/style.css" />
     <script>
       $(if advert-pending == 'yes')
@@ -239,7 +240,7 @@
       $(endif)
       <div
         class="text-center mt-12 text-[9px] uppercase tracking-[0.3em] text-slate-400 dark:text-white/70">
-        Powered by Zen — v2.0.0
+        @config('footer')
       </div>
     </div>
 

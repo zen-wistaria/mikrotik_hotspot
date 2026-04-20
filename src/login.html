@@ -5,7 +5,8 @@
     <meta http-equiv="pragma" content="no-cache" />
     <meta http-equiv="expires" content="-1" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>WiFi | Login</title>
+    <title>@config('login.meta.title')</title>
+    <meta name="description" content="@config('login.meta.description')" />
     <link rel="stylesheet" href="css/style.css" />
   </head>
 
@@ -68,11 +69,11 @@
         <div class="text-center mb-10">
           <h1
             class="text-3xl font-semibold tracking-widest text-cyan-500 dark:text-neon-blue bg-clip-text uppercase">
-            Wi.Fi Portal
+            @config('login.title')
           </h1>
           <p
             class="text-xs text-slate-500 dark:text-white/50 mt-1 uppercase tracking-widest">
-            Select your connection protocol
+            @config('login.description')
           </p>
         </div>
 
@@ -150,6 +151,7 @@
             </svg>
             Scan QR Code
           </button>
+          @include('partials/price.html')
         </div>
       </div>
 
@@ -307,7 +309,7 @@
 
       <div
         class="text-center mt-12 text-[9px] uppercase tracking-[0.3em] text-slate-400 dark:text-white/70">
-        Powered by Zen — v2.0.0
+        @config('footer')
       </div>
     </div>
 
