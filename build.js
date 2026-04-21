@@ -6,8 +6,8 @@ import { glob } from 'glob';
 import htmlMinifier from 'html-minifier-terser';
 import UglifyJS from 'uglify-js';
 
-const SRC_DIR = path.resolve(process.cwd(), 'src');
-const RESULT_DIR = path.resolve(process.cwd(), 'results');
+const SRC_DIR = './src';
+const RESULT_DIR = './results';
 
 // Function to process include directive @include('file.html')
 async function processIncludes(filePath, content, visited = new Set()) {

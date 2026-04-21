@@ -3,7 +3,7 @@ import path from 'node:path';
 import browserSync from 'browser-sync';
 import fs from 'fs-extra';
 
-const SRC_DIR = path.resolve(process.cwd(), 'src');
+const SRC_DIR = './src';
 
 // Function to process include directive @include('file.html')
 async function processIncludes(filePath, content, visited = new Set()) {
