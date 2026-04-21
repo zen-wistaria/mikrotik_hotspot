@@ -6,7 +6,7 @@ results
 out
 dist
 *.tgz
-config.json
+config.json*
 
 # code coverage
 coverage
