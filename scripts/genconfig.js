@@ -1,11 +1,13 @@
-const fs = require('fs-extra');
-const path = require('path');
+import path from 'node:path';
+import { createInterface } from 'node:readline';
+import fs from 'fs-extra';
 
 const DEFAULT_CONFIG = {
   alogin: {
     meta: {
       title: 'Wi.Fi | Redirecting',
-      description: 'Authentication required. Sending you to the login portal...',
+      description:
+        'Authentication required. Sending you to the login portal...',
     },
   },
   error: {
@@ -55,7 +57,8 @@ const DEFAULT_CONFIG = {
   rlogin: {
     meta: {
       title: 'Wi.Fi | Redirecting',
-      description: 'Authentication required. Sending you to the login portal...',
+      description:
+        'Authentication required. Sending you to the login portal...',
     },
   },
   rstatus: {
@@ -76,21 +79,21 @@ const DEFAULT_CONFIG = {
       description: 'Please login to use internet',
     },
   },
-  footer: 'Powered by Zen — v2.0.0'
+  footer: 'Powered by Zen — v2.0.0',
 };
 
 const SRC_DIR = path.join(process.cwd());
 const CONFIG_PATH = path.join(SRC_DIR, 'config.json');
 
 async function generateConfig() {
-  // Cek apakah config.json sudah ada
+  // Check if config.json already exists
   if (await fs.pathExists(CONFIG_PATH)) {
     console.log('⚠️  config.json already exists.');
-    const readline = require('readline').createInterface({
+    const readline = createInterface({
       input: process.stdin,
-      output: process.stdout
+      output: process.stdout,
     });
-    const answer = await new Promise(resolve => {
+    const answer = await new Promise((resolve) => {
       readline.question('Overwrite? (y/N): ', resolve);
     });
     readline.close();
@@ -106,7 +109,7 @@ async function generateConfig() {
   console.log('📝 Edit config.json to customize your hotspot.');
 }
 
-generateConfig().catch(err => {
+generateConfig().catch((err) => {
   console.error('❌ Failed to generate config:', err);
   process.exit(1);
 });

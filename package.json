@@ -1,6 +1,7 @@
 {
   "name": "hotspot_template_by_zen",
   "devDependencies": {
+    "@biomejs/biome": "^2.4.12",
     "browser-sync": "^3.0.4",
     "clean-css": "^5.3.3",
     "fs-extra": "^11.3.4",
@@ -15,5 +16,6 @@
     "build": "node build.js",
     "tailwind": "tailwindcss -i ./src/css/input.css -o ./src/css/style.css --watch",
     "genconfig": "node scripts/genconfig.js"
-  }
+  },
+  "type": "module"
 }

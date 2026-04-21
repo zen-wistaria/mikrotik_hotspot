@@ -1,5 +1,5 @@
-module.exports = {
-  content: ["./src/**/*.{html,js}"],
+export default {
+  content: ['./src/**/*.{html,js}'],
   darkMode: 'class',
   theme: {
     extend: {
@@ -12,8 +12,8 @@ module.exports = {
       animation: {
         'fade-in-up': 'fadeInUp 0.6s cubic-bezier(0.16, 1, 0.3, 1)',
         'glow-pulse': 'glowPulse 2s infinite ease-in-out',
-        'float': 'float 6s ease-in-out infinite',
+        float: 'float 6s ease-in-out infinite',
       },
     },
   },
-}
+};
