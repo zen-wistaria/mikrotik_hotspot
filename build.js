@@ -318,6 +318,10 @@ async function minifyHTML(html) {
   });
 }
 
+function generateHash(content) {
+  return crypto.createHash('md5').update(content).digest('hex').substring(0, 8);
+}
+
 // Build CSS Tailwind from input.css to style.css (minified)
 async function buildTailwind() {
   console.log('🎨 Building Tailwind CSS...');
@@ -348,23 +352,37 @@ async function buildTailwind() {
   }
 }
 
-function generateHash(content) {
-  return crypto.createHash('md5').update(content).digest('hex').substring(0, 8);
-}
+// Process JS files: minify + hash + copy
+async function processJSFiles() {
+  const jsFiles = glob.sync(`${SRC_DIR}/**/*.js`);
+  const hashMapping = {}; // { 'js/app.js': 'js/app.a1b2c3d4.js', 'js/md5.js': 'js/md5.e5f6g7h8.js' }
 
-async function updateCSSReferencesInHTML(cssFileName) {
-  const htmlFiles = glob.sync(`${RESULT_DIR}/**/*.html`);
-  for (const file of htmlFiles) {
+  for (const file of jsFiles) {
     const content = await fs.readFile(file, 'utf8');
-    // Replace href="css/style.css" or href='css/style.css' with new name
-    const regex = /(href=["']css\/)style\.css(["'])/g;
-    const newContent = content.replace(regex, `$1${cssFileName}$2`);
-
-    if (content !== newContent) {
-      await fs.writeFile(file, newContent);
-      console.log(`✅ Updated CSS reference in ${file} -> ${cssFileName}`);
+    // Minify JS
+    const result = UglifyJS.minify(content);
+    if (result.error) {
+      console.error(`❌ Error minify JS ${file}:`, result.error);
+      continue;
     }
+    const minified = result.code;
+    const hash = generateHash(minified);
+    const parsedPath = path.parse(file);
+    const newBasename = `${parsedPath.name}.${hash}${parsedPath.ext}`;
+    const relativePath = path.relative(SRC_DIR, file);
+    const newRelativePath = path.join(path.dirname(relativePath), newBasename);
+    const destPath = path.join(RESULT_DIR, newRelativePath);
+
+    await fs.ensureDir(path.dirname(destPath));
+    await fs.writeFile(destPath, minified);
+    console.log(`✅ JS generated: ${destPath}`);
+
+    // Save mapping for update references in HTML (use forward slash)
+    const originalRef = relativePath.split(path.sep).join('/');
+    const newRef = newRelativePath.split(path.sep).join('/');
+    hashMapping[originalRef] = newRef;
   }
+  return hashMapping;
 }
 
 // Minify CSS files (except style.css)
@@ -394,10 +412,11 @@ async function minifyJSFiles() {
 }
 
 // Process all HTML files: include + minify
-async function processHTMLFiles() {
+async function processHTMLFiles(cssFileName, jsMapping) {
   const ignorePatterns = [
     `${SRC_DIR}/partials/**/*`, // all files in partials folder
   ];
+
   const htmlFiles = glob.sync(`${SRC_DIR}/**/*.html`, {
     ignore: ignorePatterns,
   });
@@ -405,19 +424,30 @@ async function processHTMLFiles() {
     // console.log(`📄 Processing ${file}`);
     let content = await fs.readFile(file, 'utf8');
 
-    // Process config directives
+    // 1. Replace CSS reference: href="css/style.css" -> href="css/style.[hash].css"
+    content = content.replace(
+      /(href=["']css\/)style\.css(["'])/g,
+      `$1${cssFileName}$2`
+    );
+
+    // 2. Replace JS reference: src="js/app.js" -> src="js/app.[hash].js"
+    for (const [oldRef, newRef] of Object.entries(jsMapping)) {
+      const regex = new RegExp(
+        `(src=["']${oldRef.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')}["'])`,
+        'g'
+      );
+      content = content.replace(regex, `src="${newRef}"`);
+    }
+
+    // 3. Process directive (config, if, include)
     content = await processConfigDirectives(content);
-
-    // Process if directives
     content = await processIfDirectives(content);
-
-    // Process include directive
     content = await processIncludes(file, content);
 
-    // Minify HTML (with $(...) protection)
+    // 4. Minify HTML
     const minified = await minifyHTML(content);
 
-    // Determine path in result
+    // 5. Write to result
     const relativePath = path.relative(SRC_DIR, file);
     const destPath = path.join(RESULT_DIR, relativePath);
     await fs.ensureDir(path.dirname(destPath));
@@ -430,9 +460,9 @@ async function processHTMLFiles() {
 async function copyOtherFiles() {
   const ignorePatterns = [
     `${SRC_DIR}/**/*.html`, // all .html files (already processed separately)
+    `${SRC_DIR}/**/*.js`, // all .js files (already processed separately)
+    `${SRC_DIR}/**/*.css`, // all .css files (already processed separately)
     `${SRC_DIR}/partials/**/*`, // all files in partials folder (and subfolder)
-    `${SRC_DIR}/**/input.css`, // input.css file anywhere in src
-    `${SRC_DIR}/**/style.css`, // style.css file anywhere in src
   ];
 
   // Get all non-html files, except those in the ignore pattern
@@ -511,8 +541,8 @@ async function build() {
 
     await loadConfig();
     const cssFileName = await buildTailwind();
-    await processHTMLFiles();
-    await updateCSSReferencesInHTML(cssFileName);
+    const jsMapping = await processJSFiles();
+    await processHTMLFiles(cssFileName, jsMapping);
     await copyOtherFiles();
     await minifyCSSFiles();
     await minifyJSFiles();
