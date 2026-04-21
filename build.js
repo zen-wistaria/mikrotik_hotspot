@@ -11,37 +11,57 @@ const RESULT_DIR = './results';
 
 // Function to process include directive @include('file.html')
 async function processIncludes(filePath, content, visited = new Set()) {
-    const includeRegex = /@include\(([^)]+)\)/g;
-    let newContent = content;
-    const baseDir = path.dirname(filePath);
-    let match;
+  const includeRegex = /@include\(([^)]+)\)/g;
+  let newContent = content;
+  const baseDir = path.dirname(filePath);
 
-    while ((match = includeRegex.exec(content)) !== null) {
-        let includePath = match[1].trim();
-        
-        if ((includePath.startsWith("'") && includePath.endsWith("'")) ||
-            (includePath.startsWith('"') && includePath.endsWith('"'))) {
-            includePath = includePath.slice(1, -1);
-        }
-        
-        const fullIncludePath = path.resolve(baseDir, includePath);
-        
-        if (visited.has(fullIncludePath)) {
-            console.warn(`⚠️ Circular include detected: ${fullIncludePath}`);
-            continue;
-        }
-        visited.add(fullIncludePath);
-        
-        if (await fs.pathExists(fullIncludePath)) {
-            let includeContent = await fs.readFile(fullIncludePath, 'utf8');
-            includeContent = await processIncludes(fullIncludePath, includeContent, visited);
-            newContent = newContent.replace(match[0], includeContent);
-        } else {
-            console.error(`❌ File not found: ${fullIncludePath} (included from ${filePath})`);
-        }
-        visited.delete(fullIncludePath);
+  let match = includeRegex.exec(newContent);
+
+  while (match !== null) {
+    let includePath = match[1].trim();
+
+    if (
+      (includePath.startsWith("'") && includePath.endsWith("'")) ||
+      (includePath.startsWith('"') && includePath.endsWith('"'))
+    ) {
+      includePath = includePath.slice(1, -1);
     }
-    return newContent;
+
+    const fullIncludePath = path.resolve(baseDir, includePath);
+
+    if (visited.has(fullIncludePath)) {
+      match = includeRegex.exec(newContent);
+      continue;
+    }
+
+    visited.add(fullIncludePath);
+
+    if (await fs.pathExists(fullIncludePath)) {
+      let includeContent = await fs.readFile(fullIncludePath, 'utf8');
+
+      // 🔄 urutan processing
+      includeContent = await processConfigDirectives(includeContent);
+      includeContent = await processIfDirectives(includeContent);
+      includeContent = await processIncludes(
+        fullIncludePath,
+        includeContent,
+        visited
+      );
+
+      newContent = newContent.replace(match[0], includeContent);
+
+      // ⚠️ important: reset regex because string changed
+      includeRegex.lastIndex = 0;
+    } else {
+      console.error(`❌ File not found: ${fullIncludePath}`);
+    }
+
+    visited.delete(fullIncludePath);
+
+    match = includeRegex.exec(newContent);
+  }
+
+  return newContent;
 }
 
 // Function to process config directive @config('...')
@@ -82,22 +102,24 @@ function getNestedValue(obj, keyPath) {
 }
 
 async function processConfigDirectives(content) {
-    const config = await loadConfig();
-    const regex = /@config\(([^)]+)\)/g;
-    return content.replace(regex, (_match, param) => {
-        let keyPath = param.trim();
-    
-        if ((keyPath.startsWith("'") && keyPath.endsWith("'")) ||
-            (keyPath.startsWith('"') && keyPath.endsWith('"'))) {
-            keyPath = keyPath.slice(1, -1);
-        }
-        const value = getNestedValue(config, keyPath);
-        if (value === undefined) {
-            console.warn(`⚠️ Key config '${keyPath}' tidak ditemukan di config.json`);
-            return '';
-        }
-        return String(value);
-    });
+  const config = await loadConfig();
+  const regex = /@config\(([^)]+)\)/g;
+  return content.replace(regex, (_match, param) => {
+    let keyPath = param.trim();
+
+    if (
+      (keyPath.startsWith("'") && keyPath.endsWith("'")) ||
+      (keyPath.startsWith('"') && keyPath.endsWith('"'))
+    ) {
+      keyPath = keyPath.slice(1, -1);
+    }
+    const value = getNestedValue(config, keyPath);
+    if (value === undefined) {
+      console.warn(`⚠️ Key config '${keyPath}' tidak ditemukan di config.json`);
+      return '';
+    }
+    return String(value);
+  });
 }
 
 // Function to process if directive @if(...), @else(...), @endif(...)
@@ -134,24 +156,149 @@ function evaluateCondition(expr, config) {
   }
 }
 
-// Doesn't support nested if @elseif
 async function processIfDirectives(content) {
   const config = await loadConfig();
-  const ifRegex = /@if\((.+?)\)\s*([\s\S]*?)\s*@endif/gi;
-  return content.replace(ifRegex, (_match, condition, block) => {
-    // Check @if @else @endif there are in block
-    const elseParts = block.split(/@else\s*/);
-    const ifBlock = elseParts[0];
-    const elseBlock = elseParts.length > 1 ? elseParts[1] : '';
+  const lines = content.split('\n');
+  const output = [];
+  const stack = []; // stack for blocks that haven't been closed
 
-    const condResult = evaluateCondition(condition, config);
-    if (condResult) {
-      // remove @elseif
-      return ifBlock.replace(/@elseif\(.+?\)\s*/g, '');
-    } else {
-      return elseBlock;
+  let i = 0;
+  while (i < lines.length) {
+    const line = lines[i];
+
+    // @if(condition)
+    const ifMatch = line.match(/^\s*@if\((.+)\)\s*$/);
+    if (ifMatch) {
+      const condition = ifMatch[1].trim();
+      stack.push({
+        type: 'if',
+        condition: condition,
+        children: [],
+        ifBlock: null,
+        elseIfConditions: [],
+        elseContent: null,
+        currentBlock: 'if',
+      });
+      i++;
+      continue;
     }
-  });
+
+    // @elseif(condition)
+    const elseifMatch = line.match(/^\s*@elseif\((.+)\)\s*$/);
+    if (elseifMatch) {
+      if (stack.length === 0) {
+        console.warn('@elseif tanpa @if');
+        i++;
+        continue;
+      }
+      const top = stack[stack.length - 1];
+      if (top.currentBlock === 'if') {
+        top.ifBlock = top.children;
+        top.children = [];
+        top.currentBlock = 'elseif';
+        top.elseIfConditions.push({
+          condition: elseifMatch[1].trim(),
+          block: [],
+        });
+      } else if (top.currentBlock === 'elseif') {
+        const last = top.elseIfConditions[top.elseIfConditions.length - 1];
+        last.block = top.children;
+        top.children = [];
+        top.elseIfConditions.push({
+          condition: elseifMatch[1].trim(),
+          block: [],
+        });
+      } else {
+        console.warn('@elseif setelah @else');
+      }
+      i++;
+      continue;
+    }
+
+    // @else
+    const elseMatch = line.match(/^\s*@else\s*$/);
+    if (elseMatch) {
+      if (stack.length === 0) {
+        console.warn('@else tanpa @if');
+        i++;
+        continue;
+      }
+      const top = stack[stack.length - 1];
+      if (top.currentBlock === 'if') {
+        top.ifBlock = top.children;
+        top.children = [];
+        top.currentBlock = 'else';
+      } else if (top.currentBlock === 'elseif') {
+        const last = top.elseIfConditions[top.elseIfConditions.length - 1];
+        last.block = top.children;
+        top.children = [];
+        top.currentBlock = 'else';
+      } else {
+        console.warn('@else ganda');
+      }
+      i++;
+      continue;
+    }
+
+    // @endif
+    const endifMatch = line.match(/^\s*@endif\s*$/);
+    if (endifMatch) {
+      if (stack.length === 0) {
+        console.warn('@endif tanpa @if');
+        i++;
+        continue;
+      }
+      const top = stack.pop();
+
+      // Save last block if not already saved
+      if (top.currentBlock === 'if') {
+        top.ifBlock = top.children;
+      } else if (top.currentBlock === 'elseif') {
+        const last = top.elseIfConditions[top.elseIfConditions.length - 1];
+        last.block = top.children;
+      } else if (top.currentBlock === 'else') {
+        top.elseContent = top.children;
+      }
+
+      // Evaluate which block to render
+      let rendered = false;
+      if (top.ifBlock) {
+        const condResult = evaluateCondition(top.condition, config);
+        if (condResult) {
+          output.push(...top.ifBlock);
+          rendered = true;
+        }
+      }
+      if (!rendered && top.elseIfConditions) {
+        for (const ec of top.elseIfConditions) {
+          const condResult = evaluateCondition(ec.condition, config);
+          if (condResult) {
+            output.push(...ec.block);
+            rendered = true;
+            break;
+          }
+        }
+      }
+      if (!rendered && top.elseContent) {
+        output.push(...top.elseContent);
+      }
+      i++;
+      continue;
+    }
+
+    // Row normal: add to top stack or output
+    if (stack.length === 0) {
+      output.push(line);
+    } else {
+      stack[stack.length - 1].children.push(line);
+    }
+    i++;
+  }
+
+  if (stack.length > 0) {
+    console.warn('⚠️ Ada @if tanpa @endif');
+  }
+  return output.join('\n');
 }
 
 // Minify HTML with protection for MikroTik $(...) directive
@@ -227,14 +374,14 @@ async function processHTMLFiles() {
     // console.log(`📄 Processing ${file}`);
     let content = await fs.readFile(file, 'utf8');
 
-    // Process include directive
-    content = await processIncludes(file, content);
-
     // Process config directives
     content = await processConfigDirectives(content);
 
     // Process if directives
     content = await processIfDirectives(content);
+
+    // Process include directive
+    content = await processIncludes(file, content);
 
     // Minify HTML (with $(...) protection)
     const minified = await minifyHTML(content);
