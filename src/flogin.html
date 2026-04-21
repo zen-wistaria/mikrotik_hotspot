@@ -2,13 +2,13 @@
 <html lang="en">
 
 <head>
-  <meta charset="utf-8" />
-  <meta http-equiv="pragma" content="no-cache" />
-  <meta http-equiv="expires" content="-1" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta charset="utf-8">
+  <meta http-equiv="pragma" content="no-cache">
+  <meta http-equiv="expires" content="-1">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>@config('flogin.meta.title')</title>
   <meta name="description" content="@config('flogin.meta.description')">
-  <link rel="stylesheet" href="css/style.css" />
+  <link rel="stylesheet" href="css/style.css">
 </head>
 
 <body
@@ -55,9 +55,9 @@
       $(error)
     </div>
 
-    <button class="neon-btn group uppercase tracking-widest text-xs italic"
+    <button class="neon-btn group uppercase tracking-widest text-xs italic" type="button"
       onclick="window.location.href = '$(link-login)'">
-      Retry Authentication
+      @config(flogin.button)
       <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4 transition-transform group-hover:translate-x-1"
         viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
         stroke-linejoin="round">

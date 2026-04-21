@@ -15,7 +15,7 @@
     class="bg-slate-50 text-slate-900 dark:bg-dark-primary dark:text-white font-['Outfit',sans-serif] min-h-screen flex items-center justify-center overflow-x-hidden p-4 transition-all w-full">
     <div class="bg-mesh"></div>
 
-    <button
+    <button type="button"
         class="theme-toggle fixed top-5 right-5 w-11 h-11 rounded-full bg-black/5 border border-black/5 dark:bg-white/5 dark:border-white/10 flex items-center justify-center cursor-pointer backdrop-blur-md z-50 transition-all hover:rotate-12 hover:bg-black/10 dark:hover:bg-white/10"
         title="Toggle Theme">
         <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5 fill-current" viewBox="0 0 24 24">
@@ -60,10 +60,10 @@
             </div>
         </div>
 
-        <button id="skip-btn"
+        <button id="skip-btn" type="button"
             class="neon-btn group uppercase tracking-widest text-[10px] font-black italic mt-8 opacity-50 cursor-not-allowed"
             disabled>
-            Go to Internet
+            @config(trials.button)
             <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4 transition-transform group-hover:translate-x-1"
                 viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
                 stroke-linejoin="round">
@@ -73,7 +73,7 @@
         </button>
 
         <p class="text-center mt-6 text-[9px] uppercase tracking-widest text-slate-400 dark:text-white/50">
-            Your session will begin automatically after the countdown.
+            @config(trials.message)
         </p>
         <div class="text-center mt-12 text-[9px] uppercase tracking-[0.3em] text-slate-400 dark:text-white/70">
             @config('footer')

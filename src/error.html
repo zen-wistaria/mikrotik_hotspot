@@ -74,8 +74,8 @@
 
     <button
       class="neon-btn group bg-none bg-red-500 hover:shadow-[0_0_25px_rgba(239,68,68,0.4)] uppercase tracking-widest text-sm italic"
-      onclick="window.location.href = '$(link-login)'">
-      Go to Login Page
+      type="button" onclick="window.location.href = '$(link-login)'">
+      @config(error.button)
       <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4 transition-transform group-hover:rotate-180"
         viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
         stroke-linejoin="round">
