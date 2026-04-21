@@ -46,7 +46,7 @@
       }
       document.sendin.username.value = user;
       document.sendin.password.value = hexMD5(
-        `$(chap-id)${pass}$(chap-challenge)`
+        "$(chap-id)" + pass + "$(chap-challenge)"
       );
       document.sendin.submit();
       return false;
