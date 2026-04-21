@@ -418,6 +418,57 @@ async function copyOtherFiles() {
   }
 }
 
+async function generateErrorsFile() {
+  const config = await loadConfig();
+  const errorsFile = path.join(RESULT_DIR, 'errors.txt');
+  let content;
+  if (config.errors_lang === 'en') {
+    content = `
+internal-error = internal error ($(error-orig))
+config-error = configuration error ($(error-orig))
+not-logged-in = you are not logged in (ip $(ip))
+ippool-empty = cannot assign ip address - no more free addresses from pool
+shutting-down = hotspot service is shutting down
+user-session-limit = no more sessions are allowed for user $(username)
+license-session-limit = session limit reached ($(error-orig))
+wrong-mac-username = invalid username ($(username)): this MAC address is not yours
+chap-missing = web browser did not send challenge response (try again, enable JavaScript)
+invalid-username = invalid username or password
+otp-already-used = this OTP token is already used
+invalid-mac = user $(username) is not allowed to log in from this MAC address
+uptime-limit = user $(username) has reached uptime limit
+traffic-limit = user $(username) has reached traffic limit
+radius-timeout = RADIUS server is not responding
+auth-in-progress = already authorizing, retry later
+radius-reply = $(error-orig)
+`;
+  } else if (config.errors_lang === 'id') {
+    content = `
+internal-error = error internal ($(error-orig))
+config-error = error konfigurasi ($(error-orig))
+not-logged-in = lo belum login (ip $(ip))
+ippool-empty = ga bisa dapet IP - alamat IP di pool udah habis
+shutting-down = layanan hotspot lagi dimatiin
+user-session-limit = sesi buat user $(username) udah mentok, ga bisa nambah lagi
+license-session-limit = limit sesi udah kena ($(error-orig))
+wrong-mac-username = username ga valid ($(username)): MAC address ini bukan punya lo
+chap-missing = browser lo ga ngirim response challenge (coba lagi, aktifin JavaScript)
+invalid-username = username atau password salah
+otp-already-used = token OTP ini udah kepake
+invalid-mac = user $(username) ga diizinin login dari MAC address ini
+uptime-limit = user $(username) udah nyampe batas waktu pemakaian
+traffic-limit = user $(username) udah nyampe batas kuota
+radius-timeout = server RADIUS ga ngerespon
+auth-in-progress = lagi proses autentikasi, coba lagi nanti
+radius-reply = $(error-orig)
+`;
+  }
+  if (content) {
+    fs.writeFile(errorsFile, content);
+    console.log(`✅ Written errors.txt: ${errorsFile}`);
+  }
+}
+
 // Main build
 async function build() {
   try {
@@ -432,6 +483,7 @@ async function build() {
     await copyOtherFiles();
     await minifyCSSFiles();
     await minifyJSFiles();
+    await generateErrorsFile();
 
     console.log(`\n✨ Build completed! Result folder: ${RESULT_DIR}`);
   } catch (err) {

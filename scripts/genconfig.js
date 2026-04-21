@@ -5,6 +5,7 @@ import fs from 'fs-extra';
 const DEFAULT_CONFIG = {
   simple: true,
   price_list: false,
+  errors_lang: 'en',
   alogin: {
     meta: {
       title: 'Wi.Fi | Redirecting',
@@ -151,7 +152,6 @@ async function generateConfig() {
     }
   }
 
-  // Tulis config.json dengan format JSON yang rapi
   await fs.writeJson(CONFIG_PATH, DEFAULT_CONFIG, { spaces: 2 });
   console.log('✅ Generated config.json with default settings.');
   console.log('📝 Edit config.json to customize your hotspot.');
