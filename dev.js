@@ -82,6 +82,57 @@ async function processConfigDirectives(content) {
     return newContent;
 }
 
+// Function to process if directive @if(...), @else(...), @endif(...)
+function evaluateCondition(expr, config) {
+    // Replace config.key pattern (supports nested like config.site.title)
+    expr = expr.replace(/config\.([a-zA-Z_][a-zA-Z0-9_.]*)/g, (match, keyPath) => {
+        const value = getNestedValue(config, keyPath);
+        // Convert to JSON string to be safe for comparison (string, number, boolean)
+        return value !== undefined ? JSON.stringify(value) : 'null';
+    });
+    
+    // If there is still config('...') give a warning and assume false
+    if (expr.includes('config(')) {
+        console.warn(`⚠️ Avoid config('key'), use config.key: ${expr}`);
+        return false;
+    }
+    
+    // Validate expression only contains safe characters
+    const allowedPattern = /^[\w\s'\"!=<>|&().+\-*\/%]+$/;
+    if (!allowedPattern.test(expr)) {
+        console.warn(`⚠️ Invalid expression: ${expr}`);
+        return false;
+    }
+    
+    try {
+        const fn = new Function('return (' + expr + ')');
+        return fn();
+    } catch (e) {
+        console.warn(`⚠️ Failed to evaluate condition: ${expr}`, e.message);
+        return false;
+    }
+}
+
+// Doesn't support nested if @elseif
+async function processIfDirectives(content) {
+    const config = await loadConfig();
+    const ifRegex = /@if\((.+?)\)\s*([\s\S]*?)\s*@endif/gi;
+    return content.replace(ifRegex, (match, condition, block) => {
+        // Check @if @else @endif there are in block
+        const elseParts = block.split(/@else\s*/);
+        const ifBlock = elseParts[0];
+        const elseBlock = elseParts.length > 1 ? elseParts[1] : '';
+        
+        const condResult = evaluateCondition(condition, config);
+        if (condResult) {
+            // remove @elseif 
+            return ifBlock.replace(/@elseif\(.+?\)\s*/g, '');
+        } else {
+            return elseBlock;
+        }
+    });
+}
+
 // Middleware for BrowserSync – process .html files dynamically
 function htmlIncludeMiddleware(req, res, next) {
     const url = req.url;
@@ -95,11 +146,13 @@ function htmlIncludeMiddleware(req, res, next) {
     fs.readFile(fullPath, 'utf8')
         .then(async (content) => {
             // Process all @include directives
-            const processed = await processIncludes(fullPath, content);
+            let processed = await processIncludes(fullPath, content);
             // Process all @config directives
-            const processedWithConfig = await processConfigDirectives(processed);
+            processed = await processConfigDirectives(processed);
+            // Process all @if @elseif @else @endif directives
+            processed = await processIfDirectives(processed);
             res.setHeader('Content-Type', 'text/html');
-            res.end(processedWithConfig);
+            res.end(processed);
         })
         .catch((err) => {
             if (err.code === 'ENOENT') {
@@ -138,7 +191,8 @@ function startDevServer() {
             `${SRC_DIR}/**/*.html`,
             `${SRC_DIR}/**/*.css`,
             `${SRC_DIR}/**/*.js`,
-            `${SRC_DIR}/**/*.input.css` // let Tailwind source also trigger reload
+            `${SRC_DIR}/**/*.input.css`, // let Tailwind source also trigger reload
+            `${process.cwd()}/config.json` // let config.json also trigger reload
         ],
         // Optional: reload delay to let files save
         reloadDelay: 100
@@ -146,7 +200,7 @@ function startDevServer() {
 
     console.log('🚀 Development server running at http://localhost:3000');
     console.log('📁 Watch folder: ' + SRC_DIR);
-    console.log('⚡ Hot reload aktif untuk HTML, CSS, JS');
+    console.log('⚡ Hot reload active for HTML, CSS, JS');
 }
 
 // Main dev

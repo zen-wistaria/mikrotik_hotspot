@@ -89,6 +89,57 @@ async function processConfigDirectives(content) {
     return newContent;
 }
 
+// Function to process if directive @if(...), @else(...), @endif(...)
+function evaluateCondition(expr, config) {
+    // Replace config.key pattern (supports nested like config.site.title)
+    expr = expr.replace(/config\.([a-zA-Z_][a-zA-Z0-9_.]*)/g, (match, keyPath) => {
+        const value = getNestedValue(config, keyPath);
+        // Convert to JSON string to be safe for comparison (string, number, boolean)
+        return value !== undefined ? JSON.stringify(value) : 'null';
+    });
+    
+    // If there is still config('...') give a warning and assume false
+    if (expr.includes('config(')) {
+        console.warn(`⚠️ Avoid config('key'), use config.key: ${expr}`);
+        return false;
+    }
+    
+    // Validate expression only contains safe characters
+    const allowedPattern = /^[\w\s'\"!=<>|&().+\-*\/%]+$/;
+    if (!allowedPattern.test(expr)) {
+        console.warn(`⚠️ Invalid expression: ${expr}`);
+        return false;
+    }
+    
+    try {
+        const fn = new Function('return (' + expr + ')');
+        return fn();
+    } catch (e) {
+        console.warn(`⚠️ Failed to evaluate condition: ${expr}`, e.message);
+        return false;
+    }
+}
+
+// Doesn't support nested if @elseif
+async function processIfDirectives(content) {
+    const config = await loadConfig();
+    const ifRegex = /@if\((.+?)\)\s*([\s\S]*?)\s*@endif/gi;
+    return content.replace(ifRegex, (match, condition, block) => {
+        // Check @if @else @endif there are in block
+        const elseParts = block.split(/@else\s*/);
+        const ifBlock = elseParts[0];
+        const elseBlock = elseParts.length > 1 ? elseParts[1] : '';
+        
+        const condResult = evaluateCondition(condition, config);
+        if (condResult) {
+            // remove @elseif 
+            return ifBlock.replace(/@elseif\(.+?\)\s*/g, '');
+        } else {
+            return elseBlock;
+        }
+    });
+}
+
 // Minify HTML with protection for MikroTik $(...) directive
 async function minifyHTML(html) {
     return await htmlMinifier.minify(html, {
@@ -163,6 +214,9 @@ async function processHTMLFiles() {
 
         // Process config directives
         content = await processConfigDirectives(content);
+
+        // Process if directives
+        content = await processIfDirectives(content);
         
         // Minify HTML (with $(...) protection)
         const minified = await minifyHTML(content);
