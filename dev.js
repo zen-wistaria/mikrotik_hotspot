@@ -84,17 +84,22 @@ function getNestedValue(obj, keyPath) {
 }
 
 async function processConfigDirectives(content) {
-  const config = await loadConfig();
-  const regex = /@config\(['"](.+?)['"]\)/g;
-  const newContent = content.replace(regex, (_match, keyPath) => {
-    const value = getNestedValue(config, keyPath);
-    if (value === undefined) {
-      console.warn(`⚠️ Key config '${keyPath}' not found in config.json`);
-      return '';
-    }
-    return String(value);
-  });
-  return newContent;
+    const config = await loadConfig();
+    const regex = /@config\(([^)]+)\)/g;
+    return content.replace(regex, (_match, param) => {
+        let keyPath = param.trim();
+    
+        if ((keyPath.startsWith("'") && keyPath.endsWith("'")) ||
+            (keyPath.startsWith('"') && keyPath.endsWith('"'))) {
+            keyPath = keyPath.slice(1, -1);
+        }
+        const value = getNestedValue(config, keyPath);
+        if (value === undefined) {
+            console.warn(`⚠️ Key config '${keyPath}' tidak ditemukan di config.json`);
+            return '';
+        }
+        return String(value);
+    });
 }
 
 // Function to process if directive @if(...), @else(...), @endif(...)
