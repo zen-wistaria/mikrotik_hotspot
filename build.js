@@ -1,4 +1,5 @@
 import { execSync } from 'node:child_process';
+import crypto from 'node:crypto';
 import path from 'node:path';
 import CleanCSS from 'clean-css';
 import fs from 'fs-extra';
@@ -321,18 +322,48 @@ async function minifyHTML(html) {
 async function buildTailwind() {
   console.log('🎨 Building Tailwind CSS...');
   const inputCss = path.join(SRC_DIR, 'css', 'input.css');
-  const outputCss = path.join(RESULT_DIR, 'css', 'style.css');
+  const tempCss = path.join(RESULT_DIR, 'css', 'style.tmp.css');
 
-  // ensure result/css folder
-  await fs.ensureDir(path.dirname(outputCss));
+  await fs.ensureDir(path.dirname(tempCss));
 
   try {
-    execSync(`npx tailwindcss -i "${inputCss}" -o "${outputCss}" --minify`, {
+    execSync(`npx tailwindcss -i "${inputCss}" -o "${tempCss}" --minify`, {
       stdio: 'inherit',
     });
-    console.log(`✅ Tailwind CSS generated: ${outputCss}`);
+
+    // Read file result to hash
+    const cssContent = await fs.readFile(tempCss, 'utf8');
+    const hash = generateHash(cssContent);
+    const newCssName = `style.${hash}.css`;
+    const finalCssPath = path.join(RESULT_DIR, 'css', newCssName);
+
+    // Rename file from temporary to final name
+    await fs.move(tempCss, finalCssPath, { overwrite: true });
+    console.log(`✅ Tailwind CSS generated: ${finalCssPath}`);
+
+    return newCssName;
   } catch (err) {
-    console.error('Gagal build Tailwind:', err);
+    console.error('Failed build Tailwind:', err);
+    throw err;
+  }
+}
+
+function generateHash(content) {
+  return crypto.createHash('md5').update(content).digest('hex').substring(0, 8);
+}
+
+async function updateCSSReferencesInHTML(cssFileName) {
+  const htmlFiles = glob.sync(`${RESULT_DIR}/**/*.html`);
+  for (const file of htmlFiles) {
+    const content = await fs.readFile(file, 'utf8');
+    // Replace href="css/style.css" or href='css/style.css' with new name
+    const regex = /(href=["']css\/)style\.css(["'])/g;
+    const newContent = content.replace(regex, `$1${cssFileName}$2`);
+
+    if (content !== newContent) {
+      await fs.writeFile(file, newContent);
+      console.log(`✅ Updated CSS reference in ${file} -> ${cssFileName}`);
+    }
   }
 }
 
@@ -401,6 +432,7 @@ async function copyOtherFiles() {
     `${SRC_DIR}/**/*.html`, // all .html files (already processed separately)
     `${SRC_DIR}/partials/**/*`, // all files in partials folder (and subfolder)
     `${SRC_DIR}/**/input.css`, // input.css file anywhere in src
+    `${SRC_DIR}/**/style.css`, // style.css file anywhere in src
   ];
 
   // Get all non-html files, except those in the ignore pattern
@@ -478,8 +510,9 @@ async function build() {
     console.log('🚀 Starting build...\n');
 
     await loadConfig();
-    await buildTailwind();
+    const cssFileName = await buildTailwind();
     await processHTMLFiles();
+    await updateCSSReferencesInHTML(cssFileName);
     await copyOtherFiles();
     await minifyCSSFiles();
     await minifyJSFiles();
