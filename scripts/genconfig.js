@@ -3,36 +3,56 @@ import { createInterface } from 'node:readline';
 import fs from 'fs-extra';
 
 const DEFAULT_CONFIG = {
+  simple: true,
+  price_list: false,
   alogin: {
     meta: {
       title: 'Wi.Fi | Redirecting',
       description:
         'Authentication required. Sending you to the login portal...',
     },
+    title: 'Access Granted',
+    description: 'Authentication successful. Initializing secure tunnel...',
   },
   error: {
     meta: {
       title: 'Wi.Fi | Error',
       description: 'An error occurred during authentication. Please try again.',
     },
+    title: 'System Error',
+    description: 'The authentication protocol has encountered an anomaly.',
+    button: 'Go to Login Page',
   },
   flogin: {
     meta: {
       title: 'Wi.Fi | Login Error',
       description: 'Please login to use internet',
     },
+    title: 'Login Error',
+    description: 'Something went wrong with your authentication request.',
+    button: 'Return Authentication',
   },
   flogout: {
     meta: {
-      title: 'Wi.Fi | Session Inactive',
-      description: 'Your session has expired. Please login again.',
+      title: 'Wi.Fi | No Active Session',
+      description: 'No active session was found for your device.',
     },
+    title: 'Disconnected',
+    description: 'No active session was found for your device.',
+    message:
+      'The logout request was ignored because you are already disconnected or were never logged in.',
+    button: 'Enter Login Page',
   },
   fstatus: {
     meta: {
       title: 'Wi.Fi | Authentication Required',
       description: 'Please login to use internet',
     },
+    title: 'Authentication Required',
+    description: 'Access to this page is restricted for unauthenticated users.',
+    message:
+      'Please sign in to view your current connection status and session details.',
+    button: 'Go to Login Page',
   },
   login: {
     meta: {
@@ -41,18 +61,30 @@ const DEFAULT_CONFIG = {
     },
     title: 'Wi.Fi Portal',
     description: 'Select your connection protocol',
+    buttonTrial: 'Gratisan',
+    buttonAuth: 'Authenticate',
+    buttonConnect: 'Connect',
+    buttonScan: 'Scan QR Code',
+    buttonPrice: 'Price List',
   },
   logout: {
     meta: {
       title: 'Wi.Fi | Logged Out',
       description: 'You have been logged out of the network.',
     },
+    title: 'Session Closed',
+    description: 'You have been logged out of the network.',
+    footer: 'Secure Logout Protocol Completed',
+    button: 'Return to Login',
   },
   radvert: {
     meta: {
       title: 'Wi.Fi | Advertisement',
       description: 'Advertisement',
     },
+    title: 'Sponsored Access',
+    description: 'Authentication redirected. Opening advertisement...',
+    button: 'Continue to Destination',
   },
   rlogin: {
     meta: {
@@ -60,24 +92,40 @@ const DEFAULT_CONFIG = {
       description:
         'Authentication required. Sending you to the login portal...',
     },
+    title: 'Redirecting',
+    description: 'Authentication required. Sending you to the login portal...',
   },
   rstatus: {
     meta: {
       title: 'Wi.Fi | Session Active',
       description: 'Your session is active. You are connected to the network.',
     },
+    title: 'Session Active',
+    description:
+      'You are already authenticated. Redirecting to your destination...',
   },
   status: {
     meta: {
       title: 'Wi.Fi | Status',
       description: 'Your connection status and session details.',
     },
+    title: 'Session Active',
+    description: 'Welcome back, you are already authenticated.',
+    footer: 'Session Live & Secured',
+    button: 'Terminate Session',
   },
   trials: {
     meta: {
       title: 'Wi.Fi | Trials',
       description: 'Please login to use internet',
     },
+    title: 'Please Wait',
+    description:
+      'Please wait a moment while we establish your secure connection.',
+    message:
+      "Selamat menikmati internet gratis. <br> jangan lupa do'akan yang punya wifi agar banyak rezeki nya. <br> Aaamminnnn.. 🤲",
+    footer: 'Your session will begin automatically after the countdown.',
+    button: 'Go to Internet',
   },
   footer: 'Powered by Zen — v2.0.0',
 };

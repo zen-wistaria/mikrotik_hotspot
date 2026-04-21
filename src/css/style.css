@@ -1015,10 +1015,6 @@ body:is(.dark *) {
   width: 100%;
 }
 
-.max-w-sm {
-  max-width: 24rem;
-}
-
 .flex-1 {
   flex: 1 1 0%;
 }
@@ -1369,12 +1365,21 @@ body:is(.dark *) {
   line-height: 2.25rem;
 }
 
+.text-4xl {
+  font-size: 2.25rem;
+  line-height: 2.5rem;
+}
+
 .text-\[10px\] {
   font-size: 10px;
 }
 
 .text-\[11px\] {
   font-size: 11px;
+}
+
+.text-\[12px\] {
+  font-size: 12px;
 }
 
 .text-\[9px\] {
@@ -1501,10 +1506,6 @@ body:is(.dark *) {
 .text-white {
   --tw-text-opacity: 1;
   color: rgb(255 255 255 / var(--tw-text-opacity, 1));
-}
-
-.text-white\/30 {
-  color: rgb(255 255 255 / 0.3);
 }
 
 .text-yellow-500 {
@@ -1738,10 +1739,6 @@ body:is(.dark *) {
   background-color: rgb(255 255 255 / 0.05);
 }
 
-.dark\:text-black\/30:is(.dark *) {
-  color: rgb(0 0 0 / 0.3);
-}
-
 .dark\:text-cyan-500:is(.dark *) {
   --tw-text-opacity: 1;
   color: rgb(6 182 212 / var(--tw-text-opacity, 1));
@@ -1775,6 +1772,10 @@ body:is(.dark *) {
 
 .dark\:text-white\/70:is(.dark *) {
   color: rgb(255 255 255 / 0.7);
+}
+
+.dark\:text-white\/90:is(.dark *) {
+  color: rgb(255 255 255 / 0.9);
 }
 
 .dark\:hover\:bg-white\/10:hover:is(.dark *) {

@@ -1,77 +1,66 @@
 <!doctype html>
 <html lang="en">
-  <head>
-    <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <meta http-equiv="refresh" content="2; url=$(link-redirect)" />
-    <meta http-equiv="pragma" content="no-cache" />
-    <meta http-equiv="expires" content="-1" />
-    <title>@config('alogin.meta.title)</title>
-    <meta name="description" content="@config('alogin.meta.description')">
-    <link rel="stylesheet" href="css/style.css" />
-    <script>
-      function startClock() {
-        $(if popup == 'true')
+
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta http-equiv="refresh" content="2; url=$(link-redirect)" />
+  <meta http-equiv="pragma" content="no-cache" />
+  <meta http-equiv="expires" content="-1" />
+  <title>@config(alogin.meta.title)</title>
+  <meta name="description" content="@config(alogin.meta.description)">
+  <link rel="stylesheet" href="css/style.css" />
+  <script>
+    function startClock() {
+      $(if popup == 'true')
         open('$(link-status)', 'hotspot_status', 'toolbar=0,location=0,directories=0,status=0,menubars=0,resizable=1,width=290,height=200');
-        $(endif)
-        location.href = unescape('$(link-redirect-esc)');
-      }
-    </script>
-  </head>
+      $(endif)
+      location.href = unescape('$(link-redirect-esc)');
+    }
+  </script>
+</head>
 
-  <body
-    class="bg-slate-50 text-slate-900 dark:bg-dark-primary dark:text-white font-['Outfit',sans-serif] min-h-screen flex items-center justify-center overflow-x-hidden p-4 transition-all"
-    onLoad="startClock()">
-    <div class="bg-mesh"></div>
+<body
+  class="bg-slate-50 text-slate-900 dark:bg-dark-primary dark:text-white font-['Outfit',sans-serif] min-h-screen flex items-center justify-center overflow-x-hidden p-4 transition-all"
+  onLoad="startClock()">
+  <div class="bg-mesh"></div>
 
-    <div class="glass-card text-center">
-      <div
-        class="w-16 h-16 bg-green-500/10 border border-green-500/20 rounded-full flex items-center justify-center mx-auto mb-6 animate-glow-pulse">
-        <svg
-          xmlns="http://www.w3.org/2000/svg"
-          class="w-10 h-10 text-green-500"
-          viewBox="0 0 24 24"
-          fill="none"
-          stroke="currentColor"
-          stroke-width="2"
-          stroke-linecap="round"
-          stroke-linejoin="round">
-          <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14" />
-          <polyline points="22 4 12 14.01 9 11.01" />
-        </svg>
-      </div>
+  <div class="glass-card text-center">
+    <div
+      class="w-16 h-16 bg-green-500/10 border border-green-500/20 rounded-full flex items-center justify-center mx-auto mb-6 animate-glow-pulse">
+      <svg xmlns="http://www.w3.org/2000/svg" class="w-10 h-10 text-green-500" viewBox="0 0 24 24" fill="none"
+        stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14" />
+        <polyline points="22 4 12 14.01 9 11.01" />
+      </svg>
+    </div>
 
-      <div class="mb-8">
-        <h1
-          class="text-3xl font-semibold tracking-widest text-cyan-500 dark:text-neon-blue bg-clip-text uppercase">
-          Access Granted
-        </h1>
-        <p
-          class="text-[10px] text-slate-400 dark:text-white/70 mt-1 uppercase tracking-widest leading-relaxed">
-          Authentication successful. Initializing secure tunnel...
-        </p>
-      </div>
-
-      <div class="flex justify-center mb-8">
-        <div
-          class="w-10 h-10 border-2 border-black/5 dark:border-white/5 border-t-neon-blue rounded-full animate-spin"></div>
-      </div>
-
-      <p
-        class="text-[10px] text-slate-400 dark:text-white/50 uppercase tracking-[0.15em]">
-        If you are not redirected,
-        <a
-          href="$(link-orig)"
-          class="text-neon-blue font-bold border-b border-neon-blue/20 hover:border-neon-blue transition-all"
-          >click here</a
-        >
+    <div class="mb-8">
+      <h1 class="text-3xl font-semibold tracking-widest text-cyan-500 dark:text-neon-blue bg-clip-text uppercase">
+        @config(alogin.title)
+      </h1>
+      <p class="text-[10px] text-slate-400 dark:text-white/70 mt-1 uppercase tracking-widest leading-relaxed">
+        @config(alogin.description)
       </p>
-      <div
-        class="text-center mt-12 text-[9px] uppercase tracking-[0.3em] text-slate-400 dark:text-white/70">
-        @config('footer')
+    </div>
+
+    <div class="flex justify-center mb-8">
+      <div class="w-10 h-10 border-2 border-black/5 dark:border-white/5 border-t-neon-blue rounded-full animate-spin">
       </div>
     </div>
 
-    <script src="js/app.js"></script>
-  </body>
+    <p class="text-[10px] text-slate-400 dark:text-white/50 uppercase tracking-[0.15em]">
+      If you are not redirected,
+      <a href="$(link-orig)"
+        class="text-neon-blue font-bold border-b border-neon-blue/20 hover:border-neon-blue transition-all">click
+        here</a>
+    </p>
+    <div class="text-center mt-12 text-[9px] uppercase tracking-[0.3em] text-slate-400 dark:text-white/70">
+      @config('footer')
+    </div>
+  </div>
+
+  <script src="js/app.js"></script>
+</body>
+
 </html>
