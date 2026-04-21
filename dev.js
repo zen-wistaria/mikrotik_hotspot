@@ -7,46 +7,37 @@ const SRC_DIR = './src';
 
 // Function to process include directive @include('file.html')
 async function processIncludes(filePath, content, visited = new Set()) {
-  const includeRegex = /@include\(['"](.+?)['"]\)/g;
-  let newContent = content;
-  const baseDir = path.dirname(filePath);
+    const includeRegex = /@include\(([^)]+)\)/g;
+    let newContent = content;
+    const baseDir = path.dirname(filePath);
+    let match;
 
-  let match = includeRegex.exec(newContent);
-
-  while (match !== null) {
-    const includePath = match[1];
-    const fullIncludePath = path.resolve(baseDir, includePath);
-
-    if (visited.has(fullIncludePath)) {
-      console.warn(`⚠️ Circular include detected: ${fullIncludePath}`);
-      match = includeRegex.exec(newContent);
-      continue;
+    while ((match = includeRegex.exec(content)) !== null) {
+        let includePath = match[1].trim();
+        
+        if ((includePath.startsWith("'") && includePath.endsWith("'")) ||
+            (includePath.startsWith('"') && includePath.endsWith('"'))) {
+            includePath = includePath.slice(1, -1);
+        }
+        
+        const fullIncludePath = path.resolve(baseDir, includePath);
+        
+        if (visited.has(fullIncludePath)) {
+            console.warn(`⚠️ Circular include detected: ${fullIncludePath}`);
+            continue;
+        }
+        visited.add(fullIncludePath);
+        
+        if (await fs.pathExists(fullIncludePath)) {
+            let includeContent = await fs.readFile(fullIncludePath, 'utf8');
+            includeContent = await processIncludes(fullIncludePath, includeContent, visited);
+            newContent = newContent.replace(match[0], includeContent);
+        } else {
+            console.error(`❌ File not found: ${fullIncludePath} (included from ${filePath})`);
+        }
+        visited.delete(fullIncludePath);
     }
-
-    visited.add(fullIncludePath);
-
-    if (await fs.pathExists(fullIncludePath)) {
-      let includeContent = await fs.readFile(fullIncludePath, 'utf8');
-
-      includeContent = await processIncludes(
-        fullIncludePath,
-        includeContent,
-        visited
-      );
-
-      newContent = newContent.replace(match[0], includeContent);
-    } else {
-      console.error(
-        `❌ File not found: ${fullIncludePath} (included from ${filePath})`
-      );
-    }
-
-    visited.delete(fullIncludePath);
-
-    match = includeRegex.exec(newContent);
-  }
-
-  return newContent;
+    return newContent;
 }
 
 // Function to process config directive @config('...')
