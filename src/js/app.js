@@ -47,105 +47,21 @@ document.addEventListener('DOMContentLoaded', () => {
   if (themeToggleBtn) themeToggleBtn.addEventListener('click', toggleTheme);
   initTheme();
 
-  // View Management (Portal vs Form)
-  const initialView = document.getElementById('initial-view');
-  const formView = document.getElementById('form-view');
-  const btnAuthenticate = document.getElementById('btn-authenticate');
-  const btnBack = document.getElementById('btn-back');
-
-  const showLoginView = () => {
-    if (initialView && formView) {
-      initialView.classList.add('opacity-0', '-translate-x-10');
-      setTimeout(() => {
-        initialView.classList.add('hidden');
-        formView.classList.remove('hidden');
-        setTimeout(() => {
-          formView.classList.remove('opacity-0', 'scale-95');
-        }, 50);
-      }, 300);
-    }
-  };
-
-  const hideLoginView = () => {
-    if (initialView && formView) {
-      formView.classList.add('opacity-0', 'scale-95');
-      setTimeout(() => {
-        formView.classList.add('hidden');
-        initialView.classList.remove('hidden');
-        setTimeout(() => {
-          initialView.classList.remove('opacity-0', '-translate-x-10');
-        }, 50);
-      }, 300);
-    }
-  };
-
-  if (btnAuthenticate) btnAuthenticate.addEventListener('click', showLoginView);
-  if (btnBack) btnBack.addEventListener('click', hideLoginView);
-
-  // Tab Management (Member vs Voucher)
-  const tabBtns = document.querySelectorAll('.tab-btn');
-  const passwordGroup = document.getElementById('password-group');
-  const usernameLabel = document.getElementById('username-label');
-  const usernameInput = document.querySelector(
-    'input[name="username"].input-field'
-  );
-
-  if (tabBtns.length > 0) {
-    tabBtns.forEach((btn) => {
-      btn.addEventListener('click', () => {
-        tabBtns.forEach((b) => {
-          b.classList.remove('active');
-          b.setAttribute('data-active', 'false');
-        });
-        btn.classList.add('active');
-        btn.setAttribute('data-active', 'true');
-
-        const type = btn.getAttribute('data-type');
-        if (type === 'member') {
-          if (passwordGroup) passwordGroup.style.display = 'block';
-          if (usernameLabel) usernameLabel.textContent = 'Username';
-          if (usernameInput) usernameInput.placeholder = 'Enter Username';
-        } else {
-          if (passwordGroup) {
-            passwordGroup.style.display = 'none';
-            passwordGroup.querySelector('input').value = '';
-          }
-          if (usernameLabel) usernameLabel.textContent = 'Voucher Code';
-          if (usernameInput) usernameInput.placeholder = 'Enter Voucher Code';
-        }
-      });
-    });
-  }
-
-  // Price List Toggle
-  const priceBtn = document.getElementById('price-btn');
-  const priceList = document.getElementById('price-list');
-
-  if (priceBtn && priceList) {
-    priceBtn.addEventListener('click', () => {
-      priceList.classList.toggle('hidden');
-      // Add subtle animation or scroll if needed
-      if (!priceList.classList.contains('hidden')) {
-        priceList.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
-      }
-    });
-  }
-
   // Loading State & Login Prep
-  const loginForm = document.querySelector('form[name="login"]');
-  if (loginForm) {
-    loginForm.addEventListener('submit', () => {
-      const activeTab = document.querySelector('.tab-btn.active');
-      if (activeTab && activeTab.getAttribute('data-type') === 'voucher') {
-        const passInput = loginForm.querySelector('input[name="password"]');
-        const userVal = loginForm.querySelector('input[name="username"]').value;
-        if (passInput) passInput.value = userVal;
-      }
+  // const loginForm = document.querySelector('form[name="login"]');
+  // if (loginForm) {
+  //   loginForm.addEventListener('submit', () => {
+  //     const activeTab = document.querySelector('.tab-btn.active');
+  //     if (activeTab && activeTab.getAttribute('data-type') === 'voucher') {
+  //       const passInput = loginForm.querySelector('input[name="password"]');
+  //       const userVal = loginForm.querySelector('input[name="username"]').value;
+  //       if (passInput) passInput.value = userVal;
+  //     }
 
-      const loader = document.getElementById('loader');
-      if (loader) loader.style.display = 'flex';
-    });
-  }
+  //     const loader = document.getElementById('loader');
+  //     if (loader) loader.style.display = 'flex';
+  //   });
+  // }
 
   // Session Timer (Status Page)
   // const uptimeElement = document.getElementById('uptime');
@@ -158,40 +74,40 @@ document.addEventListener('DOMContentLoaded', () => {
   // }
 });
 
-function parseUptime(uptimeStr) {
-  if (uptimeStr.includes(':')) {
-    const parts = uptimeStr.split(':').reverse();
-    return (
-      (parseInt(parts[0]) || 0) +
-      (parseInt(parts[1]) || 0) * 60 +
-      (parseInt(parts[2]) || 0) * 3600 +
-      (parseInt(parts[3]) || 0) * 86400
-    );
-  }
-  let totalSeconds = 0;
-  const days = uptimeStr.match(/(\d+)d/);
-  const hours = uptimeStr.match(/(\d+)h/);
-  const mins = uptimeStr.match(/(\d+)m/);
-  const secs = uptimeStr.match(/(\d+)s/);
+// function parseUptime(uptimeStr) {
+//   if (uptimeStr.includes(':')) {
+//     const parts = uptimeStr.split(':').reverse();
+//     return (
+//       (parseInt(parts[0]) || 0) +
+//       (parseInt(parts[1]) || 0) * 60 +
+//       (parseInt(parts[2]) || 0) * 3600 +
+//       (parseInt(parts[3]) || 0) * 86400
+//     );
+//   }
+//   let totalSeconds = 0;
+//   const days = uptimeStr.match(/(\d+)d/);
+//   const hours = uptimeStr.match(/(\d+)h/);
+//   const mins = uptimeStr.match(/(\d+)m/);
+//   const secs = uptimeStr.match(/(\d+)s/);
 
-  if (days) totalSeconds += parseInt(days[1]) * 86400;
-  if (hours) totalSeconds += parseInt(hours[1]) * 3600;
-  if (mins) totalSeconds += parseInt(mins[1]) * 60;
-  if (secs) totalSeconds += parseInt(secs[1]);
+//   if (days) totalSeconds += parseInt(days[1]) * 86400;
+//   if (hours) totalSeconds += parseInt(hours[1]) * 3600;
+//   if (mins) totalSeconds += parseInt(mins[1]) * 60;
+//   if (secs) totalSeconds += parseInt(secs[1]);
 
-  return totalSeconds || 0;
-}
+//   return totalSeconds || 0;
+// }
 
-function formatUptime(seconds) {
-  const d = Math.floor(seconds / 86400);
-  const h = Math.floor((seconds % 86400) / 3600);
-  const m = Math.floor((seconds % 3600) / 60);
-  const s = seconds % 60;
+// function formatUptime(seconds) {
+//   const d = Math.floor(seconds / 86400);
+//   const h = Math.floor((seconds % 86400) / 3600);
+//   const m = Math.floor((seconds % 3600) / 60);
+//   const s = seconds % 60;
 
-  let res = '';
-  if (d > 0) res += d + 'd ';
-  if (h > 0 || d > 0) res += (h < 10 ? '0' + h : h) + ':';
-  res += (m < 10 ? '0' + m : m) + ':';
-  res += s < 10 ? '0' + s : s;
-  return res;
-}
+//   let res = '';
+//   if (d > 0) res += d + 'd ';
+//   if (h > 0 || d > 0) res += (h < 10 ? '0' + h : h) + ':';
+//   res += (m < 10 ? '0' + m : m) + ':';
+//   res += s < 10 ? '0' + s : s;
+//   return res;
+// }
