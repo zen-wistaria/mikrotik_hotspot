@@ -1,15 +1,18 @@
 <div id="initial-view" class="transition-all duration-500">
   <div class="text-center mb-10">
-    <div class="flex justify-center gap-2 items-center">
-      <div class="flex items-center">
-        <svg xmlns="http://www.w3.org/2000/svg" width="100" height="100" viewBox="0 0 24 24" fill="none"
+    <div class="flex justify-center gap-2 md:gap-4 items-center animate-fade-in-up [animation-duration:2s]">
+      <div class="flex items-center relative left-5 md:left-0 animate-glow-pulse [animation-duration:2s]">
+        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none"
           stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
-          class="text-cyan-500 dark:text-neon-blue">
-          <path d="M6 16.326A7 7 0 1 1 15.71 8h1.79a4.5 4.5 0 0 1 .5 8.973" />
-          <path d="m13 12-3 5h4l-3 5" />
+          class="text-cyan-500 dark:text-neon-blue w-20 h-20">
+          <path
+            d="M12.034 12.681a.498.498 0 0 1 .647-.647l9 3.5a.5.5 0 0 1-.033.943l-3.444 1.068a1 1 0 0 0-.66.66l-1.067 3.443a.5.5 0 0 1-.943.033z" />
+          <path d="M5 17A12 12 0 0 1 17 5" />
+          <circle cx="19" cy="5" r="2" />
+          <circle cx="5" cy="19" r="2" />
         </svg>
       </div>
-      <div class="flex flex-col">
+      <div class="flex flex-col animate-glow-pulse [animation-duration:2s]">
         <span
           class="text-center text-cyan-500 dark:text-neon-blue font-semibold text-4xl tracking-widest">@config('login.title')</span>
         <p class="text-xs text-slate-500 dark:text-white/90 mt-1 uppercase tracking-widest">
