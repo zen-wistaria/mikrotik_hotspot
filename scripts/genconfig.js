@@ -4,7 +4,21 @@ import fs from 'fs-extra';
 
 const DEFAULT_CONFIG = {
   simple: true,
-  price_list: false,
+  price: false,
+  price_lists: [
+    {
+      title: '1 Jam',
+      price: 'Rp. 1000',
+    },
+    {
+      title: '1 Hari',
+      price: 'Rp. 2000',
+    },
+    {
+      title: '1 Minggu',
+      price: 'Rp. 5000'
+    }
+  ],
   errors_lang: 'en',
   alogin: {
     meta: {
