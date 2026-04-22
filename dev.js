@@ -5,344 +5,322 @@ import fs from 'fs-extra';
 
 const SRC_DIR = './src';
 
-// Function to process include directive @include('file.html')
-async function processIncludes(filePath, content, visited = new Set()) {
-  const includeRegex = /@include\(([^)]+)\)/g;
-  let newContent = content;
-  const baseDir = path.dirname(filePath);
+let configCache = null;
 
-  let match = includeRegex.exec(newContent);
-
-  while (match !== null) {
-    let includePath = match[1].trim();
-
-    if (
-      (includePath.startsWith("'") && includePath.endsWith("'")) ||
-      (includePath.startsWith('"') && includePath.endsWith('"'))
-    ) {
-      includePath = includePath.slice(1, -1);
-    }
-
-    const fullIncludePath = path.resolve(baseDir, includePath);
-
-    if (visited.has(fullIncludePath)) {
-      match = includeRegex.exec(newContent);
-      continue;
-    }
-
-    visited.add(fullIncludePath);
-
-    if (await fs.pathExists(fullIncludePath)) {
-      let includeContent = await fs.readFile(fullIncludePath, 'utf8');
-
-      // 🔄 urutan processing
-      includeContent = await processConfigDirectives(includeContent);
-      includeContent = await processIfDirectives(includeContent);
-      includeContent = await processIncludes(
-        fullIncludePath,
-        includeContent,
-        visited
-      );
-
-      newContent = newContent.replace(match[0], includeContent);
-
-      // ⚠️ important: reset regex because string changed
-      includeRegex.lastIndex = 0;
-    } else {
-      console.error(`❌ File not found: ${fullIncludePath}`);
-    }
-
-    visited.delete(fullIncludePath);
-
-    match = includeRegex.exec(newContent);
-  }
-
-  return newContent;
-}
-
-// Function to process config directive @config('...')
+/**
+ * Load config.json once then cache
+ */
 async function loadConfig() {
+  // if (configCache) return configCache;
+
   const configPath = path.join(process.cwd(), 'config.json');
+
   if (!(await fs.pathExists(configPath))) {
-    console.error('\n❌ ERROR: config.json not found in root folder!');
-    console.error('📝 Please generate it first by running:');
-    console.error('   npm run genconfig\n');
-    process.exit(1);
+    throw new Error('config.json not found. Run: npm run genconfig');
   }
 
-  try {
-    const content = await fs.readFile(configPath, 'utf8');
-    return JSON.parse(content);
-  } catch (e) {
-    console.error('❌ Failed to parse config.json:', e.message);
-    console.error('📝 Please check your src/config.json syntax.\n');
-    process.exit(1);
-  }
+  const content = await fs.readFile(configPath, 'utf8');
+  configCache = JSON.parse(content);
+
+  return configCache;
 }
 
+/**
+ * Get value nested from object using dot notation
+ */
 function getNestedValue(obj, keyPath) {
-  // Supports key like 'site.title' or 'title'
-  const keys = keyPath.split('.');
-  let value = obj;
-  for (const k of keys) {
-    if (value && typeof value === 'object' && k in value) {
-      value = value[k];
-    } else {
-      return undefined;
+  return keyPath.split('.').reduce((acc, key) => {
+    if (acc && typeof acc === 'object' && key in acc) {
+      return acc[key];
     }
-  }
-  return value;
+    return undefined;
+  }, obj);
 }
 
-async function processConfigDirectives(content) {
-  const config = await loadConfig();
-  const regex = /@config\(([^)]+)\)/g;
-  return content.replace(regex, (_match, param) => {
-    let keyPath = param.trim();
+/**
+ * Replace directive @config('key')
+ */
+function processConfigDirectives(content, config) {
+  return content.replace(/@config\(([^)]+)\)/g, (_, param) => {
+    const key = param.trim().replace(/^['"]|['"]$/g, '');
+    const value = getNestedValue(config, key);
 
-    if (
-      (keyPath.startsWith("'") && keyPath.endsWith("'")) ||
-      (keyPath.startsWith('"') && keyPath.endsWith('"'))
-    ) {
-      keyPath = keyPath.slice(1, -1);
-    }
-    const value = getNestedValue(config, keyPath);
     if (value === undefined) {
-      console.warn(`⚠️ Key config '${keyPath}' tidak ditemukan di config.json`);
+      console.warn(`⚠️ config '${key}' tidak ditemukan`);
       return '';
     }
+
     return String(value);
   });
 }
 
-// Function to process if directive @if(...), @else(...), @endif(...)
+/**
+ * Evaluate condition @if with safe
+ */
 function evaluateCondition(expr, config) {
-  // Replace config.key pattern (supports nested like config.site.title)
-  expr = expr.replace(
-    /config\.([a-zA-Z_][a-zA-Z0-9_.]*)/g,
-    (_match, keyPath) => {
-      const value = getNestedValue(config, keyPath);
-      // Convert to JSON string to be safe for comparison (string, number, boolean)
-      return value !== undefined ? JSON.stringify(value) : 'null';
-    }
+  const safeExpr = expr.replace(/config\.([a-zA-Z0-9_.]+)/g, (_, path) =>
+    JSON.stringify(getNestedValue(config, path))
   );
 
-  // If there is still config('...') give a warning and assume false
-  if (expr.includes('config(')) {
-    console.warn(`⚠️ Avoid config('key'), use config.key: ${expr}`);
-    return false;
-  }
-
-  // Validate expression only contains safe characters
-  const allowedPattern = /^[\w\s'"!=<>|&().+\-*/%]+$/;
-  if (!allowedPattern.test(expr)) {
+  if (!/^[\w\s'"!=<>|&().+\-*/%]+$/.test(safeExpr)) {
     console.warn(`⚠️ Invalid expression: ${expr}`);
     return false;
   }
 
   try {
-    const fn = new Function(`return (${expr})`);
-    return fn();
-  } catch (e) {
-    console.warn(`⚠️ Failed to evaluate condition: ${expr}`, e.message);
+    return Function(`"use strict"; return (${safeExpr})`)();
+  } catch {
     return false;
   }
 }
 
-async function processIfDirectives(content) {
-  const config = await loadConfig();
+/**
+ * Process directive @if, @elseif, @else, @endif
+ */
+async function processIfDirectives(content, config) {
   const lines = content.split('\n');
   const output = [];
-  const stack = []; // stack for blocks that haven't been closed
+  const stack = [];
 
-  let i = 0;
-  while (i < lines.length) {
+  for (let i = 0; i < lines.length; i++) {
     const line = lines[i];
 
-    // @if(condition)
     const ifMatch = line.match(/^\s*@if\((.+)\)\s*$/);
     if (ifMatch) {
-      const condition = ifMatch[1].trim();
       stack.push({
         type: 'if',
-        condition: condition,
+        condition: ifMatch[1],
         children: [],
-        ifBlock: null,
-        elseIfConditions: [],
-        elseContent: null,
-        currentBlock: 'if',
+        elseIf: [],
+        elseBlock: null,
+        mode: 'if',
       });
-      i++;
       continue;
     }
 
-    // @elseif(condition)
     const elseifMatch = line.match(/^\s*@elseif\((.+)\)\s*$/);
-    if (elseifMatch) {
-      if (stack.length === 0) {
-        console.warn('@elseif tanpa @if');
-        i++;
-        continue;
-      }
+    if (elseifMatch && stack.length) {
       const top = stack[stack.length - 1];
-      if (top.currentBlock === 'if') {
-        top.ifBlock = top.children;
-        top.children = [];
-        top.currentBlock = 'elseif';
-        top.elseIfConditions.push({
-          condition: elseifMatch[1].trim(),
-          block: [],
-        });
-      } else if (top.currentBlock === 'elseif') {
-        const last = top.elseIfConditions[top.elseIfConditions.length - 1];
-        last.block = top.children;
-        top.children = [];
-        top.elseIfConditions.push({
-          condition: elseifMatch[1].trim(),
-          block: [],
-        });
-      } else {
-        console.warn('@elseif setelah @else');
-      }
-      i++;
+      top.elseIf.push({
+        condition: elseifMatch[1],
+        block: [],
+      });
+      top.mode = 'elseif';
       continue;
     }
 
-    // @else
-    const elseMatch = line.match(/^\s*@else\s*$/);
-    if (elseMatch) {
-      if (stack.length === 0) {
-        console.warn('@else tanpa @if');
-        i++;
-        continue;
-      }
+    if (/^\s*@else\s*$/.test(line) && stack.length) {
       const top = stack[stack.length - 1];
-      if (top.currentBlock === 'if') {
-        top.ifBlock = top.children;
-        top.children = [];
-        top.currentBlock = 'else';
-      } else if (top.currentBlock === 'elseif') {
-        const last = top.elseIfConditions[top.elseIfConditions.length - 1];
-        last.block = top.children;
-        top.children = [];
-        top.currentBlock = 'else';
-      } else {
-        console.warn('@else ganda');
-      }
-      i++;
+      top.mode = 'else';
+      top.elseBlock = [];
       continue;
     }
 
-    // @endif
-    const endifMatch = line.match(/^\s*@endif\s*$/);
-    if (endifMatch) {
-      if (stack.length === 0) {
-        console.warn('@endif tanpa @if');
-        i++;
-        continue;
-      }
+    if (/^\s*@endif\s*$/.test(line)) {
       const top = stack.pop();
 
-      // Save last block if not already saved
-      if (top.currentBlock === 'if') {
-        top.ifBlock = top.children;
-      } else if (top.currentBlock === 'elseif') {
-        const last = top.elseIfConditions[top.elseIfConditions.length - 1];
-        last.block = top.children;
-      } else if (top.currentBlock === 'else') {
-        top.elseContent = top.children;
+      let rendered = false;
+
+      if (evaluateCondition(top.condition, config)) {
+        output.push(...top.children);
+        rendered = true;
       }
 
-      // Evaluate which block to render
-      let rendered = false;
-      if (top.ifBlock) {
-        const condResult = evaluateCondition(top.condition, config);
-        if (condResult) {
-          output.push(...top.ifBlock);
-          rendered = true;
-        }
-      }
-      if (!rendered && top.elseIfConditions) {
-        for (const ec of top.elseIfConditions) {
-          const condResult = evaluateCondition(ec.condition, config);
-          if (condResult) {
-            output.push(...ec.block);
+      if (!rendered) {
+        for (const e of top.elseIf) {
+          if (evaluateCondition(e.condition, config)) {
+            output.push(...e.block);
             rendered = true;
             break;
           }
         }
       }
-      if (!rendered && top.elseContent) {
-        output.push(...top.elseContent);
+
+      if (!rendered && top.elseBlock) {
+        output.push(...top.elseBlock);
       }
-      i++;
+
       continue;
     }
 
-    // Row normal: add to top stack or output
     if (stack.length === 0) {
       output.push(line);
     } else {
-      stack[stack.length - 1].children.push(line);
+      const top = stack[stack.length - 1];
+
+      if (top.mode === 'if') {
+        top.children.push(line);
+      } else if (top.mode === 'elseif') {
+        top.elseIf[top.elseIf.length - 1].block.push(line);
+      } else {
+        top.elseBlock.push(line);
+      }
     }
-    i++;
   }
 
-  if (stack.length > 0) {
-    console.warn('⚠️ Ada @if tanpa @endif');
-  }
   return output.join('\n');
 }
 
-// Middleware for BrowserSync – process .html files dynamically
-function htmlIncludeMiddleware(req, res, next) {
-  const url = req.url;
-  // Only process .html files (and root / -> login.html)
-  const filePath = url === '/' ? '/login.html' : url;
-  if (!filePath.endsWith('.html')) {
-    return next(); // let BrowserSync handle other files (CSS, JS, images)
+/**
+ * Process directive @foreach
+ */
+async function processForeachDirectives(content, config) {
+  const regex = /@foreach\(([^)]+)\)\s*([\s\S]*?)@endforeach/g;
+
+  let match = regex.exec(content);
+  let result = content;
+
+  while (match !== null) {
+    const [full, params, inner] = match;
+
+    const asMatch = params.match(/^(.+?)\s+as\s+(?:(\w+)\s*=>\s*)?(\w+)$/);
+    if (!asMatch) {
+      console.log(`⚠️ @foreach syntax error`);
+      return content;
+    }
+
+    const arrayPath = asMatch[1].replace(/^config\./, '').trim();
+    const keyVar = asMatch[2];
+    const itemVar = asMatch[3];
+
+    const arr = getNestedValue(config, arrayPath);
+    if (!Array.isArray(arr)) {
+      console.log(`⚠️ @foreach ${arrayPath} is not an array`);
+      return content;
+    }
+
+    let loopResult = '';
+
+    for (let i = 0; i < arr.length; i++) {
+      let block = inner;
+      const item = arr[i];
+
+      if (keyVar) {
+        block = block.replace(
+          new RegExp(`\\{\\{\\s*${keyVar}\\s*\\}\\}`, 'g'),
+          i
+        );
+      }
+
+      if (typeof item === 'object') {
+        block = block.replace(
+          new RegExp(`\\{\\{\\s*${itemVar}\\.(\\w+)\\s*\\}\\}`, 'g'),
+          (_, prop) => item[prop] ?? ''
+        );
+      } else {
+        block = block.replace(
+          new RegExp(`\\{\\{\\s*${itemVar}\\s*\\}\\}`, 'g'),
+          String(item)
+        );
+      }
+
+      block = processConfigDirectives(block, config);
+      block = await processIfDirectives(block, config);
+
+      loopResult += block;
+    }
+
+    result = result.replace(full, loopResult);
+
+    match = regex.exec(content);
   }
 
-  const fullPath = path.join(SRC_DIR, filePath);
-  fs.readFile(fullPath, 'utf8')
-    .then(async (content) => {
-      // Process all @config directives
-      let processed = await processConfigDirectives(content);
-      // Process all @if @elseif @else @endif directives
-      processed = await processIfDirectives(processed);
-      // Process all @include directives
-      processed = await processIncludes(fullPath, processed);
-      res.setHeader('Content-Type', 'text/html');
-      res.end(processed);
-    })
-    .catch((err) => {
-      if (err.code === 'ENOENT') {
-        res.statusCode = 404;
-        res.end(`File ${filePath} not found`);
-      } else {
-        next(err);
-      }
-    });
+  return result;
 }
 
-// Run Tailwind CSS watch mode as child process
+/**
+ * Process directive @include recursively
+ */
+async function processIncludes(baseDir, content, config, visited = new Set()) {
+  const regex = /@include\(([^)]+)\)/g;
+
+  let match = regex.exec(content);
+  let result = content;
+
+  while (match !== null) {
+    const [full, raw] = match;
+    const file = raw.trim().replace(/^['"]|['"]$/g, '');
+
+    const fullPath = path.resolve(baseDir, file);
+
+    if (visited.has(fullPath)) continue;
+
+    visited.add(fullPath);
+
+    if (!(await fs.pathExists(fullPath))) continue;
+
+    let fileContent = await fs.readFile(fullPath, 'utf8');
+
+    fileContent = processConfigDirectives(fileContent, config);
+    fileContent = await processIfDirectives(fileContent, config);
+    fileContent = await processForeachDirectives(
+      fileContent,
+      config,
+      path.dirname(fullPath)
+    );
+    fileContent = await processIncludes(
+      path.dirname(fullPath),
+      fileContent,
+      config,
+      visited
+    );
+
+    result = result.replace(full, fileContent);
+    
+    match = regex.exec(content);
+  }
+
+  return result;
+}
+
+/**
+ * Middleware BrowserSync
+ */
+async function htmlIncludeMiddleware(req, res, next) {
+  try {
+    const url = req.url === '/' ? '/login.html' : req.url;
+
+    if (!url.endsWith('.html')) return next();
+
+    const fullPath = path.join(SRC_DIR, url);
+    const config = await loadConfig();
+
+    let content = await fs.readFile(fullPath, 'utf8');
+    const baseDir = path.dirname(fullPath);
+
+    content = processConfigDirectives(content, config);
+    content = await processForeachDirectives(content, config, baseDir);
+    content = await processIfDirectives(content, config);
+    content = await processIncludes(baseDir, content, config);
+
+    res.setHeader('Content-Type', 'text/html');
+    res.end(content);
+  } catch (err) {
+    next(err);
+  }
+}
+
+/**
+ * Tailwind watcher
+ */
 function startTailwindWatch() {
-  console.log('🎨 Running Tailwind CSS watch mode...');
-  const tailwind = exec(
+  const proc = exec(
     'npx tailwindcss -i ./src/css/input.css -o ./src/css/style.css --watch'
   );
-  // tailwind.stdout.on('data', (data) => console.log(`[tailwind] ${data}`));
-  tailwind.stderr.on('data', (data) => console.error(`[tailwind] ${data}`));
-  return tailwind;
+
+  proc.stderr.on('data', (d) => console.error('[tailwind]', d));
+
+  return proc;
 }
 
-// Run BrowserSync with custom middleware
+/**
+ * Dev server
+ */
 function startDevServer() {
   browserSync.init({
     server: {
       baseDir: SRC_DIR,
       middleware: [htmlIncludeMiddleware],
-      // To make Tailwind compiled CSS files accessible
       serveStaticOptions: {
         extensions: ['html'],
       },
@@ -350,41 +328,25 @@ function startDevServer() {
     port: 3000,
     open: true,
     notify: false,
-    files: [
-      `${SRC_DIR}/**/*.html`,
-      `${SRC_DIR}/**/*.css`,
-      `${SRC_DIR}/**/*.js`,
-      `${SRC_DIR}/**/*.input.css`, // let Tailwind source also trigger reload
-      `${process.cwd()}/config.json`, // let config.json also trigger reload
-    ],
-    // Optional: reload delay to let files save
-    reloadDelay: 100,
+    files: [`${SRC_DIR}/**/*`, `./config.json`],
   });
-
-  console.log('🚀 Development server running at http://localhost:3000');
-  console.log(`📁 Watch folder: ${SRC_DIR}`);
-  console.log('⚡ Hot reload active for HTML, CSS, JS');
 }
 
-// Main dev
+/**
+ * Main dev
+ */
 async function dev() {
-  // Ensure src/css folder exists, create tailwind.css if not
   await fs.ensureDir(`${SRC_DIR}/css`);
-  const tailwindSrcPath = `${SRC_DIR}/css/input.css`;
-  if (!(await fs.pathExists(tailwindSrcPath))) {
+
+  const cssPath = `${SRC_DIR}/css/input.css`;
+
+  if (!(await fs.pathExists(cssPath))) {
     await fs.writeFile(
-      tailwindSrcPath,
+      cssPath,
       `@tailwind base;\n@tailwind components;\n@tailwind utilities;`
     );
-    console.log('📝 Creating default src/css/input.css');
   }
 
-  // Run Tailwind watch (output to src/css/tailwind-output.css)
-  // We will change the reference in HTML from "css/tailwind.min.css" to "css/tailwind-output.css" for development
-  // Or let HTML still refer to tailwind.min.css, but we create a temporary output.
-  // To make it neater, we can temporarily change the HTML file in memory? No need, just create output to tailwind-output.css
-  // And make sure in your login.html you use <link href="css/tailwind-output.css"> during development.
-  // For convenience, we will use the same output file.
   await loadConfig();
   startTailwindWatch();
   startDevServer();

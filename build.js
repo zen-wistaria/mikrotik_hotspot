@@ -1,7 +1,6 @@
 import { execSync } from 'node:child_process';
 import crypto from 'node:crypto';
 import path from 'node:path';
-import CleanCSS from 'clean-css';
 import fs from 'fs-extra';
 import { glob } from 'glob';
 import htmlMinifier from 'html-minifier-terser';
@@ -10,476 +9,416 @@ import UglifyJS from 'uglify-js';
 const SRC_DIR = './src';
 const RESULT_DIR = './results';
 
-// Function to process include directive @include('file.html')
-async function processIncludes(filePath, content, visited = new Set()) {
-  const includeRegex = /@include\(([^)]+)\)/g;
-  let newContent = content;
-  const baseDir = path.dirname(filePath);
+let configCache = null;
 
-  let match = includeRegex.exec(newContent);
-
-  while (match !== null) {
-    let includePath = match[1].trim();
-
-    if (
-      (includePath.startsWith("'") && includePath.endsWith("'")) ||
-      (includePath.startsWith('"') && includePath.endsWith('"'))
-    ) {
-      includePath = includePath.slice(1, -1);
-    }
-
-    const fullIncludePath = path.resolve(baseDir, includePath);
-
-    if (visited.has(fullIncludePath)) {
-      match = includeRegex.exec(newContent);
-      continue;
-    }
-
-    visited.add(fullIncludePath);
-
-    if (await fs.pathExists(fullIncludePath)) {
-      let includeContent = await fs.readFile(fullIncludePath, 'utf8');
-
-      // 🔄 urutan processing
-      includeContent = await processConfigDirectives(includeContent);
-      includeContent = await processIfDirectives(includeContent);
-      includeContent = await processIncludes(
-        fullIncludePath,
-        includeContent,
-        visited
-      );
-
-      newContent = newContent.replace(match[0], includeContent);
-
-      // ⚠️ important: reset regex because string changed
-      includeRegex.lastIndex = 0;
-    } else {
-      console.error(`❌ File not found: ${fullIncludePath}`);
-    }
-
-    visited.delete(fullIncludePath);
-
-    match = includeRegex.exec(newContent);
-  }
-
-  return newContent;
-}
-
-// Function to process config directive @config('...')
-const configCache = null;
+/**
+ * Load config.json once then cache
+ */
 async function loadConfig() {
   if (configCache) return configCache;
 
   const configPath = path.join(process.cwd(), 'config.json');
+
   if (!(await fs.pathExists(configPath))) {
-    console.error('\n❌ ERROR: config.json not found in root folder!');
-    console.error('📝 Please generate it first by running:');
-    console.error('   npm run genconfig\n');
-    process.exit(1);
+    throw new Error('config.json not found. Run: npm run genconfig');
   }
 
-  try {
-    const content = await fs.readFile(configPath, 'utf8');
-    return JSON.parse(content);
-  } catch (e) {
-    console.error('❌ Failed to parse config.json:', e.message);
-    console.error('📝 Please check your src/config.json syntax.\n');
-    process.exit(1);
-  }
+  const content = await fs.readFile(configPath, 'utf8');
+  configCache = JSON.parse(content);
+
+  return configCache;
 }
 
+/**
+ * Get value nested from object using dot notation
+ */
 function getNestedValue(obj, keyPath) {
-  // Supports key like 'site.title' or 'title'
-  const keys = keyPath.split('.');
-  let value = obj;
-  for (const k of keys) {
-    if (value && typeof value === 'object' && k in value) {
-      value = value[k];
-    } else {
-      return undefined;
+  return keyPath.split('.').reduce((acc, key) => {
+    if (acc && typeof acc === 'object' && key in acc) {
+      return acc[key];
     }
-  }
-  return value;
+    return undefined;
+  }, obj);
 }
 
-async function processConfigDirectives(content) {
-  const config = await loadConfig();
-  const regex = /@config\(([^)]+)\)/g;
-  return content.replace(regex, (_match, param) => {
-    let keyPath = param.trim();
+/**
+ * Replace directive @config('key')
+ */
+function processConfigDirectives(content, config) {
+  return content.replace(/@config\(([^)]+)\)/g, (_, param) => {
+    const key = param.trim().replace(/^['"]|['"]$/g, '');
+    const value = getNestedValue(config, key);
 
-    if (
-      (keyPath.startsWith("'") && keyPath.endsWith("'")) ||
-      (keyPath.startsWith('"') && keyPath.endsWith('"'))
-    ) {
-      keyPath = keyPath.slice(1, -1);
-    }
-    const value = getNestedValue(config, keyPath);
     if (value === undefined) {
-      console.warn(`⚠️ Key config '${keyPath}' tidak ditemukan di config.json`);
+      console.warn(`⚠️ config '${key}' tidak ditemukan`);
       return '';
     }
+
     return String(value);
   });
 }
 
-// Function to process if directive @if(...), @else(...), @endif(...)
+/**
+ * Evaluate condition @if with safe
+ */
 function evaluateCondition(expr, config) {
-  // Replace config.key pattern (supports nested like config.site.title)
-  expr = expr.replace(
-    /config\.([a-zA-Z_][a-zA-Z0-9_.]*)/g,
-    (_match, keyPath) => {
-      const value = getNestedValue(config, keyPath);
-      // Convert to JSON string to be safe for comparison (string, number, boolean)
-      return value !== undefined ? JSON.stringify(value) : 'null';
-    }
+  const safeExpr = expr.replace(/config\.([a-zA-Z0-9_.]+)/g, (_, key) =>
+    JSON.stringify(getNestedValue(config, key))
   );
 
-  // If there is still config('...') give a warning and assume false
-  if (expr.includes('config(')) {
-    console.warn(`⚠️ Avoid config('key'), use config.key: ${expr}`);
-    return false;
-  }
-
-  // Validate expression only contains safe characters
-  const allowedPattern = /^[\w\s'"!=<>|&().+\-*/%]+$/;
-  if (!allowedPattern.test(expr)) {
-    console.warn(`⚠️ Invalid expression: ${expr}`);
+  if (!/^[\w\s'"!=<>|&().+\-*/%]+$/.test(safeExpr)) {
+    console.warn(`⚠️ Invalid condition: ${expr}`);
     return false;
   }
 
   try {
-    const fn = new Function(`return (${expr})`);
-    return fn();
-  } catch (e) {
-    console.warn(`⚠️ Failed to evaluate condition: ${expr}`, e.message);
+    return Function(`"use strict"; return (${safeExpr})`)();
+  } catch {
     return false;
   }
 }
 
-async function processIfDirectives(content) {
-  const config = await loadConfig();
+/**
+ * Process directive @if, @elseif, @else, @endif
+ */
+async function processIfDirectives(content, config) {
   const lines = content.split('\n');
   const output = [];
-  const stack = []; // stack for blocks that haven't been closed
+  const stack = [];
 
-  let i = 0;
-  while (i < lines.length) {
-    const line = lines[i];
-
-    // @if(condition)
+  for (const line of lines) {
     const ifMatch = line.match(/^\s*@if\((.+)\)\s*$/);
+
     if (ifMatch) {
-      const condition = ifMatch[1].trim();
       stack.push({
-        type: 'if',
-        condition: condition,
-        children: [],
-        ifBlock: null,
-        elseIfConditions: [],
-        elseContent: null,
-        currentBlock: 'if',
+        condition: ifMatch[1],
+        ifBlock: [],
+        elseIf: [],
+        elseBlock: null,
+        mode: 'if',
       });
-      i++;
       continue;
     }
 
-    // @elseif(condition)
-    const elseifMatch = line.match(/^\s*@elseif\((.+)\)\s*$/);
-    if (elseifMatch) {
-      if (stack.length === 0) {
-        console.warn('@elseif tanpa @if');
-        i++;
-        continue;
-      }
+    const elseifMatch = line.match(/^\s*@elseif\((.+)\)/);
+    if (elseifMatch && stack.length) {
+      stack[stack.length - 1].elseIf.push({
+        condition: elseifMatch[1],
+        block: [],
+      });
+      stack[stack.length - 1].mode = 'elseif';
+      continue;
+    }
+
+    if (/^\s*@else/.test(line) && stack.length) {
       const top = stack[stack.length - 1];
-      if (top.currentBlock === 'if') {
-        top.ifBlock = top.children;
-        top.children = [];
-        top.currentBlock = 'elseif';
-        top.elseIfConditions.push({
-          condition: elseifMatch[1].trim(),
-          block: [],
-        });
-      } else if (top.currentBlock === 'elseif') {
-        const last = top.elseIfConditions[top.elseIfConditions.length - 1];
-        last.block = top.children;
-        top.children = [];
-        top.elseIfConditions.push({
-          condition: elseifMatch[1].trim(),
-          block: [],
-        });
-      } else {
-        console.warn('@elseif setelah @else');
-      }
-      i++;
+      top.mode = 'else';
+      top.elseBlock = [];
       continue;
     }
 
-    // @else
-    const elseMatch = line.match(/^\s*@else\s*$/);
-    if (elseMatch) {
-      if (stack.length === 0) {
-        console.warn('@else tanpa @if');
-        i++;
-        continue;
-      }
-      const top = stack[stack.length - 1];
-      if (top.currentBlock === 'if') {
-        top.ifBlock = top.children;
-        top.children = [];
-        top.currentBlock = 'else';
-      } else if (top.currentBlock === 'elseif') {
-        const last = top.elseIfConditions[top.elseIfConditions.length - 1];
-        last.block = top.children;
-        top.children = [];
-        top.currentBlock = 'else';
-      } else {
-        console.warn('@else ganda');
-      }
-      i++;
-      continue;
-    }
-
-    // @endif
-    const endifMatch = line.match(/^\s*@endif\s*$/);
-    if (endifMatch) {
-      if (stack.length === 0) {
-        console.warn('@endif tanpa @if');
-        i++;
-        continue;
-      }
+    if (/^\s*@endif/.test(line)) {
       const top = stack.pop();
 
-      // Save last block if not already saved
-      if (top.currentBlock === 'if') {
-        top.ifBlock = top.children;
-      } else if (top.currentBlock === 'elseif') {
-        const last = top.elseIfConditions[top.elseIfConditions.length - 1];
-        last.block = top.children;
-      } else if (top.currentBlock === 'else') {
-        top.elseContent = top.children;
+      let rendered = false;
+
+      if (evaluateCondition(top.condition, config)) {
+        output.push(...top.ifBlock);
+        rendered = true;
       }
 
-      // Evaluate which block to render
-      let rendered = false;
-      if (top.ifBlock) {
-        const condResult = evaluateCondition(top.condition, config);
-        if (condResult) {
-          output.push(...top.ifBlock);
-          rendered = true;
-        }
-      }
-      if (!rendered && top.elseIfConditions) {
-        for (const ec of top.elseIfConditions) {
-          const condResult = evaluateCondition(ec.condition, config);
-          if (condResult) {
-            output.push(...ec.block);
+      if (!rendered) {
+        for (const e of top.elseIf) {
+          if (evaluateCondition(e.condition, config)) {
+            output.push(...e.block);
             rendered = true;
             break;
           }
         }
       }
-      if (!rendered && top.elseContent) {
-        output.push(...top.elseContent);
+
+      if (!rendered && top.elseBlock) {
+        output.push(...top.elseBlock);
       }
-      i++;
+
       continue;
     }
 
-    // Row normal: add to top stack or output
     if (stack.length === 0) {
       output.push(line);
     } else {
-      stack[stack.length - 1].children.push(line);
+      const top = stack[stack.length - 1];
+
+      if (top.mode === 'if') top.ifBlock.push(line);
+      else if (top.mode === 'elseif')
+        top.elseIf[top.elseIf.length - 1].block.push(line);
+      else top.elseBlock.push(line);
     }
-    i++;
   }
 
-  if (stack.length > 0) {
-    console.warn('⚠️ Ada @if tanpa @endif');
-  }
   return output.join('\n');
 }
 
-// Minify HTML with protection for MikroTik $(...) directive
+/**
+ * Process directive @foreach
+ */
+async function processForeachDirectives(content, config) {
+  const regex = /@foreach\(([^)]+)\)\s*([\s\S]*?)@endforeach/g;
+
+  let match = regex.exec(content);
+  let result = content;
+
+  while (match !== null) {
+    const [full, params, inner] = match;
+
+    const asMatch = params.match(/^(.+?)\s+as\s+(?:(\w+)\s*=>\s*)?(\w+)$/);
+    if (!asMatch) continue;
+
+    const arrayPath = asMatch[1].replace(/^config\./, '').trim();
+    const keyVar = asMatch[2];
+    const itemVar = asMatch[3];
+
+    const arr = getNestedValue(config, arrayPath);
+    if (!Array.isArray(arr)) continue;
+
+    let loopResult = '';
+
+    for (let i = 0; i < arr.length; i++) {
+      let block = inner;
+      const item = arr[i];
+
+      if (keyVar) {
+        block = block.replace(
+          new RegExp(`\\{\\{\\s*${keyVar}\\s*\\}\\}`, 'g'),
+          i
+        );
+      }
+
+      if (typeof item === 'object') {
+        block = block.replace(
+          new RegExp(`\\{\\{\\s*${itemVar}\\.(\\w+)\\s*\\}\\}`, 'g'),
+          (_, prop) => item[prop] ?? ''
+        );
+      } else {
+        block = block.replace(
+          new RegExp(`\\{\\{\\s*${itemVar}\\s*\\}\\}`, 'g'),
+          String(item)
+        );
+      }
+
+      // chain directive
+      block = processConfigDirectives(block, config);
+      block = await processIfDirectives(block, config);
+
+      loopResult += block;
+    }
+
+    result = result.replace(full, loopResult);
+
+    match = regex.exec(content);
+  }
+
+  return result;
+}
+
+/**
+ * Process directive @include recursively
+ */
+async function processIncludes(baseDir, content, config, visited = new Set()) {
+  const regex = /@include\(([^)]+)\)/g;
+
+  let match = regex.exec(content);
+  let result = content;
+
+  while (match !== null) {
+    const [full, raw] = match;
+    const file = raw.trim().replace(/^['"]|['"]$/g, '');
+
+    const fullPath = path.resolve(baseDir, file);
+
+    if (visited.has(fullPath)) continue;
+
+    visited.add(fullPath);
+
+    if (!(await fs.pathExists(fullPath))) continue;
+
+    let fileContent = await fs.readFile(fullPath, 'utf8');
+
+    fileContent = processConfigDirectives(fileContent, config);
+    fileContent = await processForeachDirectives(
+      fileContent,
+      config,
+      path.dirname(fullPath)
+    );
+    fileContent = await processIfDirectives(fileContent, config);
+    fileContent = await processIncludes(
+      path.dirname(fullPath),
+      fileContent,
+      config,
+      visited
+    );
+
+    result = result.replace(full, fileContent);
+
+    match = regex.exec(content);
+  }
+
+  return result;
+}
+
+/**
+ * Minify HTML
+ */
 async function minifyHTML(html) {
-  return await htmlMinifier.minify(html, {
+  return htmlMinifier.minify(html, {
     collapseWhitespace: true,
     removeComments: true,
     removeRedundantAttributes: true,
     removeScriptTypeAttributes: true,
     removeStyleLinkTypeAttributes: true,
     useShortDoctype: true,
-    minifyCSS: true,
+    // removeEmptyAttributes: true,
+    // removeEmptyElements: true,
+    // removeOptionalTags: true,
     minifyJS: true,
+    minifyCSS: true,
+
     // ignore mikrotik $(...) directive
     ignoreCustomFragments: [/\$\([^)]*\)/g],
   });
 }
 
+/**
+ * Generate hash file (for cache busting)
+ */
 function generateHash(content) {
-  return crypto.createHash('md5').update(content).digest('hex').substring(0, 8);
+  return crypto.createHash('md5').update(content).digest('hex').slice(0, 8);
 }
 
-// Build CSS Tailwind from input.css to style.css (minified)
+/**
+ * Build Tailwind CSS + hash
+ */
 async function buildTailwind() {
-  console.log('🎨 Building Tailwind CSS...');
-  const inputCss = path.join(SRC_DIR, 'css', 'input.css');
-  const tempCss = path.join(RESULT_DIR, 'css', 'style.tmp.css');
+  console.log('🎨 Building Tailwind...');
+
+  const inputCss = path.join(SRC_DIR, 'css/input.css');
+  const tempCss = path.join(RESULT_DIR, 'css/style.tmp.css');
 
   await fs.ensureDir(path.dirname(tempCss));
 
-  try {
-    execSync(`npx tailwindcss -i "${inputCss}" -o "${tempCss}" --minify`, {
-      stdio: 'inherit',
-    });
-
-    // Read file result to hash
-    const cssContent = await fs.readFile(tempCss, 'utf8');
-    const hash = generateHash(cssContent);
-    const newCssName = `style.${hash}.css`;
-    const finalCssPath = path.join(RESULT_DIR, 'css', newCssName);
-
-    // Rename file from temporary to final name
-    await fs.move(tempCss, finalCssPath, { overwrite: true });
-    console.log(`✅ Tailwind CSS generated: ${finalCssPath}`);
-
-    return newCssName;
-  } catch (err) {
-    console.error('Failed build Tailwind:', err);
-    throw err;
-  }
-}
-
-// Process JS files: minify + hash + copy
-async function processJSFiles() {
-  const jsFiles = glob.sync(`${SRC_DIR}/**/*.js`);
-  const hashMapping = {}; // { 'js/app.js': 'js/app.a1b2c3d4.js', 'js/md5.js': 'js/md5.e5f6g7h8.js' }
-
-  for (const file of jsFiles) {
-    const content = await fs.readFile(file, 'utf8');
-    // Minify JS
-    const result = UglifyJS.minify(content);
-    if (result.error) {
-      console.error(`❌ Error minify JS ${file}:`, result.error);
-      continue;
-    }
-    const minified = result.code;
-    const hash = generateHash(minified);
-    const parsedPath = path.parse(file);
-    const newBasename = `${parsedPath.name}.${hash}${parsedPath.ext}`;
-    const relativePath = path.relative(SRC_DIR, file);
-    const newRelativePath = path.join(path.dirname(relativePath), newBasename);
-    const destPath = path.join(RESULT_DIR, newRelativePath);
-
-    await fs.ensureDir(path.dirname(destPath));
-    await fs.writeFile(destPath, minified);
-    console.log(`✅ JS generated: ${destPath}`);
-
-    // Save mapping for update references in HTML (use forward slash)
-    const originalRef = relativePath.split(path.sep).join('/');
-    const newRef = newRelativePath.split(path.sep).join('/');
-    hashMapping[originalRef] = newRef;
-  }
-  return hashMapping;
-}
-
-// Minify CSS files (except style.css)
-async function minifyCSSFiles() {
-  const cssFiles = glob.sync(`${RESULT_DIR}/**/*.css`);
-  for (const file of cssFiles) {
-    const content = await fs.readFile(file, 'utf8');
-    const minified = new CleanCSS().minify(content).styles;
-    await fs.writeFile(file, minified);
-    console.log(`✅ Minified CSS: ${file}`);
-  }
-}
-
-// Minify JS files
-async function minifyJSFiles() {
-  const jsFiles = glob.sync(`${RESULT_DIR}/**/*.js`);
-  for (const file of jsFiles) {
-    const content = await fs.readFile(file, 'utf8');
-    const result = UglifyJS.minify(content);
-    if (result.error) {
-      console.error(`❌ Error minify JS ${file}:`, result.error);
-    } else {
-      await fs.writeFile(file, result.code);
-      console.log(`✅ Minified JS: ${file}`);
-    }
-  }
-}
-
-// Process all HTML files: include + minify
-async function processHTMLFiles(cssFileName, jsMapping) {
-  const ignorePatterns = [
-    `${SRC_DIR}/partials/**/*`, // all files in partials folder
-  ];
-
-  const htmlFiles = glob.sync(`${SRC_DIR}/**/*.html`, {
-    ignore: ignorePatterns,
+  execSync(`npx tailwindcss -i "${inputCss}" -o "${tempCss}" --minify`, {
+    stdio: 'inherit',
   });
-  for (const file of htmlFiles) {
-    // console.log(`📄 Processing ${file}`);
+
+  const css = await fs.readFile(tempCss, 'utf8');
+  const hash = generateHash(css);
+
+  const finalName = `style.${hash}.css`;
+  const finalPath = path.join(RESULT_DIR, 'css', finalName);
+
+  await fs.move(tempCss, finalPath, { overwrite: true });
+
+  return finalName;
+}
+
+/**
+ * Process JS (minify + hash)
+ */
+async function processJSFiles() {
+  const files = glob.sync(`${SRC_DIR}/**/*.js`);
+  const mapping = {};
+
+  for (const file of files) {
+    const content = await fs.readFile(file, 'utf8');
+    const result = UglifyJS.minify(content);
+
+    if (result.error) continue;
+
+    const hash = generateHash(result.code);
+    const rel = path.relative(SRC_DIR, file);
+
+    const newName = rel.replace(/\.js$/, `.${hash}.js`);
+    const dest = path.join(RESULT_DIR, newName);
+
+    await fs.ensureDir(path.dirname(dest));
+    await fs.writeFile(dest, result.code);
+
+    mapping[rel.replace(/\\/g, '/')] = newName.replace(/\\/g, '/');
+  }
+
+  return mapping;
+}
+
+/**
+ * Process HTML (FULL PIPELINE)
+ */
+async function processHTMLFiles(cssFileName, jsMapping) {
+  const config = await loadConfig();
+
+  const files = glob.sync(`${SRC_DIR}/**/*.html`, {
+    ignore: [`${SRC_DIR}/partials/**/*`],
+  });
+
+  for (const file of files) {
     let content = await fs.readFile(file, 'utf8');
 
-    // 1. Replace CSS reference: href="css/style.css" -> href="css/style.[hash].css"
+    // replace CSS
     content = content.replace(
       /(href=["']css\/)style\.css(["'])/g,
       `$1${cssFileName}$2`
     );
 
-    // 2. Replace JS reference: src="js/app.js" -> src="js/app.[hash].js"
+    // replace JS
     for (const [oldRef, newRef] of Object.entries(jsMapping)) {
-      const regex = new RegExp(
-        `(src=["']${oldRef.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')}["'])`,
-        'g'
+      content = content.replace(
+        new RegExp(`src=["']${oldRef}["']`, 'g'),
+        `src="${newRef}"`
       );
-      content = content.replace(regex, `src="${newRef}"`);
     }
 
-    // 3. Process directive (config, if, include)
-    content = await processConfigDirectives(content);
-    content = await processIfDirectives(content);
-    content = await processIncludes(file, content);
+    const baseDir = path.dirname(file);
 
-    // 4. Minify HTML
+    // full directive chain
+    content = processConfigDirectives(content, config);
+    content = await processForeachDirectives(content, config, baseDir);
+    content = await processIfDirectives(content, config);
+    content = await processIncludes(baseDir, content, config);
+
     const minified = await minifyHTML(content);
 
-    // 5. Write to result
-    const relativePath = path.relative(SRC_DIR, file);
-    const destPath = path.join(RESULT_DIR, relativePath);
-    await fs.ensureDir(path.dirname(destPath));
-    await fs.writeFile(destPath, minified);
-    console.log(`✅ Written: ${destPath}`);
+    const dest = path.join(RESULT_DIR, path.relative(SRC_DIR, file));
+
+    await fs.ensureDir(path.dirname(dest));
+    await fs.writeFile(dest, minified);
+
+    console.log(`✅ ${dest}`);
   }
 }
 
-// Copy all non-HTML files (images, fonts, etc.) except those already processed
+/**
+ * Copy other assets (img, font, dll)
+ */
 async function copyOtherFiles() {
-  const ignorePatterns = [
-    `${SRC_DIR}/**/*.html`, // all .html files (already processed separately)
-    `${SRC_DIR}/**/*.js`, // all .js files (already processed separately)
-    `${SRC_DIR}/**/*.css`, // all .css files (already processed separately)
-    `${SRC_DIR}/partials/**/*`, // all files in partials folder (and subfolder)
-  ];
-
-  // Get all non-html files, except those in the ignore pattern
   const files = glob.sync(`${SRC_DIR}/**/*`, {
     nodir: true,
-    ignore: ignorePatterns,
+    ignore: [
+      `${SRC_DIR}/**/*.html`,
+      `${SRC_DIR}/**/*.js`,
+      `${SRC_DIR}/**/*.css`,
+      `${SRC_DIR}/partials/**/*`,
+    ],
   });
 
   for (const file of files) {
-    const relativePath = path.relative(SRC_DIR, file);
-    const destPath = path.join(RESULT_DIR, relativePath);
-    await fs.ensureDir(path.dirname(destPath));
-    await fs.copy(file, destPath);
-    console.log(`📁 Copied: ${destPath}`);
+    const dest = path.join(RESULT_DIR, path.relative(SRC_DIR, file));
+    await fs.ensureDir(path.dirname(dest));
+    await fs.copy(file, dest);
   }
 }
 
+/**
+ * Generate errors.txt
+ */
 async function generateErrorsFile() {
   const config = await loadConfig();
   const errorsFile = path.join(RESULT_DIR, 'errors.txt');
@@ -527,30 +466,32 @@ radius-reply = $(error-orig)
   }
   if (content) {
     fs.writeFile(errorsFile, content);
-    console.log(`✅ Written errors.txt: ${errorsFile}`);
+    console.log(`✅ ${errorsFile}`);
   }
 }
 
-// Main build
+/**
+ * Main build
+ */
 async function build() {
   try {
     await fs.remove(RESULT_DIR);
     await fs.ensureDir(RESULT_DIR);
 
-    console.log('🚀 Starting build...\n');
+    console.log('🚀 Build started...\n');
 
     await loadConfig();
-    const cssFileName = await buildTailwind();
-    const jsMapping = await processJSFiles();
-    await processHTMLFiles(cssFileName, jsMapping);
+
+    const cssFile = await buildTailwind();
+    const jsMap = await processJSFiles();
+
+    await processHTMLFiles(cssFile, jsMap);
     await copyOtherFiles();
-    await minifyCSSFiles();
-    await minifyJSFiles();
     await generateErrorsFile();
 
-    console.log(`\n✨ Build completed! Result folder: ${RESULT_DIR}`);
+    console.log('\n✨ Build success!');
   } catch (err) {
-    console.error('Build failed:', err);
+    console.error('❌ Build failed:', err);
   }
 }
 
