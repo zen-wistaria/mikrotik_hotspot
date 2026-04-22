@@ -215,3 +215,30 @@ function b64MD5 (str) { return binl2b64(coreMD5( str2binl(str))) }
 function b64MD5w(str) { return binl2b64(coreMD5(strw2binl(str))) }
 /* Backward compatibility */
 function calcMD5(str) { return binl2hex(coreMD5( str2binl(str))) }
+
+
+/* my custom 
+ * do login
+ */
+function doLogin() {
+  const user = document.login.username.value;
+  let pass = document.login.password.value;
+
+  if (!pass) {
+    pass = user;
+  }
+
+  document.sendin.username.value = user;
+
+  // handle via variable from HTML
+  if (window.useChap) {
+    document.sendin.password.value = hexMD5(
+      window.chapId + pass + window.chapChallenge
+    );
+  } else {
+    document.sendin.password.value = pass;
+  }
+
+  document.sendin.submit();
+  return false;
+}

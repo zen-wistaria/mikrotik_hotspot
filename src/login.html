@@ -28,7 +28,6 @@
     <div class="w-12 h-12 border-4 border-black/10 dark:border-white/10 border-t-neon-blue rounded-full animate-spin">
     </div>
   </div>
-  $(if chap-id)
   <form name="sendin" action="$(link-login-only)" method="post" style="display: none">
     <input type="hidden" name="username">
     <input type="hidden" name="password">
@@ -37,22 +36,8 @@
   </form>
   <script src="js/md5.js"></script>
   <script>
-    function doLogin() {
-      const user = document.login.username.value;
-      let pass = document.login.password.value;
-      // voucher mode
-      if (!pass) {
-        pass = user;
-      }
-      document.sendin.username.value = user;
-      document.sendin.password.value = hexMD5(
-        "$(chap-id)" + pass + "$(chap-challenge)"
-      );
-      document.sendin.submit();
-      return false;
-    }
+    window.useChap = $(if chap-id) true $(else) false $(endif); window.chapId = "$(chap-id)"; window.chapChallenge = "$(chap-challenge)";
   </script>
-  $(endif)
   @if(config.simple)
   @include('partials/login/simple.html')
   @else
