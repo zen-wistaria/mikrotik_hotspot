@@ -10,41 +10,68 @@
     <meta name="description" content="@config(qrcode.meta.description)">
     <link rel="stylesheet" href="../css/style.css">
     <script src="../js/qrcode.js"></script>
+    <script src="../js/app.js" defer></script>
   </head>
 
   <body
-    class="bg-gradient-to-br from-[#0B1120] to-[#0F172A] min-h-screen font-['Segoe_UI','Poppins','Inter',system-ui] flex justify-center items-center p-5"
+    class="bg-slate-50 text-slate-900 dark:bg-dark-primary dark:text-white font-['Outfit',sans-serif] min-h-screen flex items-center justify-center overflow-x-hidden p-4 transition-all w-full"
   >
-    <div
-      class="max-w-[650px] w-full mx-auto bg-[rgba(15,23,42,0.55)] backdrop-blur-xl rounded-3xl p-6 pb-8 shadow-2xl shadow-black/30 border border-white/5"
+    <div class="bg-mesh"></div>
+
+    <button
+      class="theme-toggle fixed top-5 right-5 w-11 h-11 rounded-full bg-black/5 border border-black/5 dark:bg-white/5 dark:border-white/10 flex items-center justify-center cursor-pointer backdrop-blur-md z-50 transition-all hover:rotate-12 hover:bg-black/10 dark:hover:bg-white/10"
+      title="Toggle Theme"
+      type="button"
     >
+      <svg
+        xmlns="http://www.w3.org/2000/svg"
+        class="w-5 h-5 fill-current"
+        viewBox="0 0 24 24"
+      >
+        <path
+          d="M12 7c-2.76 0-5 2.24-5 5s2.24 5 5 5 5-2.24 5-5-2.24-5-5-5zM2 13h2c.55 0 1-.45 1-1s-.45-1-1-1H2c-.55 0-1 .45-1 1s.45 1 1 1zm18 0h2c.55 0 1-.45 1-1s-.45-1-1-1h-2c-.55 0-1 .45-1 1s.45 1 1 1zM11 2v2c0 .55.45 1 1 1s1-.45 1-1V2c0-.55-.45-1-1-1s-1 .45-1 1zm0 18v2c0 .55.45 1 1 1s1-.45 1-1v-2c0-.55-.45-1-1-1s-1 .45-1 1zM5.99 4.58c-.39-.39-1.03-.39-1.41 0s-.39 1.03 0 1.41l1.06 1.06c.39.39 1.03.39 1.41 0s.39-1.03 0-1.41L5.99 4.58zm12.37 12.37c-.39-.39-1.03-.39-1.41 0s-.39 1.03 0 1.41l1.06 1.06c.39.39 1.03.39 1.41 0s.39-1.03 0-1.41l-1.06-1.06zm1.06-12.37c-.39-.39-1.03-.39-1.41 0l-1.06 1.06c-.39.39-.39 1.03 0 1.41s1.03.39 1.41 0l1.06-1.06c.39-.38.39-1.02 0-1.41zm-12.37 12.37c-.39-.39-1.03-.39-1.41 0l-1.06 1.06c-.39.39-.39 1.03 0 1.41s1.03.39 1.41 0l1.06-1.06c.38-.38.38-1.02 0-1.41z"
+        />
+      </svg>
+    </button>
+
+    <div
+      id="loader"
+      class="fixed inset-0 bg-slate-50 dark:bg-dark-primary z-1000 hidden items-center justify-center"
+    >
+      <div
+        class="w-12 h-12 border-4 border-black/10 dark:border-white/10 border-t-neon-blue rounded-full animate-spin"
+      ></div>
+    </div>
+    <div class="glass-card">
       <!-- Header -->
       <div class="mb-5 text-center">
         <h1
-          class="text-[1.8rem] font-extrabold bg-gradient-to-r from-[#E0E7FF] to-[#67E8F9] bg-clip-text text-transparent inline-flex items-center gap-2.5"
+          class="text-4xl font-semibold tracking-widest text-center text-cyan-500 dark:text-neon-blue uppercase"
         >
           @config(qrcode.title)
         </h1>
-        <div class="mt-2 text-sm text-slate-400">
+        <div
+          class="mt-1 text-xs tracking-widest uppercase text-slate-500 dark:text-white/50"
+        >
           @config(qrcode.description)
         </div>
       </div>
 
       <!-- Camera Stage -->
       <div
-        class="camera-stage relative bg-black rounded-xl overflow-hidden my-4 shadow-2xl shadow-black/50 border border-white/15 aspect-[4/3]"
+        class="camera-stage relative rounded-xl overflow-hidden my-4 border border-white/15 aspect-[4/3]"
       >
-        <div id="reader" class="w-full h-full bg-black"></div>
+        <div id="reader" class="w-full h-full bg-black/10 dark:bg-black"></div>
 
         <!-- Preview Stage -->
         <div
           id="previewStage"
-          class="absolute top-0 left-0 z-10 items-center justify-center hidden w-full h-full bg-black preview-stage"
+          class="absolute top-0 left-0 z-10 items-center justify-center hidden w-full h-full bg-black/10 dark:bg-black preview-stage"
         >
           <button
             type="button"
             id="closePreviewBtn"
-            class="absolute top-2.5 right-2.5 bg-black/70 border-none text-white w-8 h-8 rounded-xl cursor-pointer text-lg flex items-center justify-center z-20 hover:bg-red-700 transition-colors"
+            class="absolute top-2.5 right-2.5 bg-black/10 dark:bg-black border-none text-white w-8 h-8 rounded-xl cursor-pointer text-lg flex items-center justify-center z-20 hover:bg-red-700 transition-colors"
           >
             ✕
           </button>
@@ -59,9 +86,9 @@
         <div
           class="absolute top-0 left-0 z-20 w-full h-full pointer-events-none scan-overlay rounded-xl"
         >
-          <div
+          <!-- <div
             class="absolute top-[15px] left-[15px] right-[15px] bottom-[15px] border-2 border-[rgba(56,189,248,0.6)] rounded-xl shadow-[0_0_0_2px_rgba(0,0,0,0.3),0_0_20px_rgba(56,189,248,0.3)] animate-scan-pulse"
-          ></div>
+          ></div> -->
           <div
             class="absolute top-1/2 left-5 right-5 h-1 bg-gradient-to-r from-transparent via-[#38BDF8] to-transparent -translate-y-1/2 animate-scan-line opacity-70"
           ></div>
@@ -73,21 +100,21 @@
         <button
           type="button"
           id="switchCamBtn"
-          class="px-5 py-2.5 rounded-full font-semibold text-sm bg-slate-800/90 backdrop-blur text-slate-100 border border-slate-700 shadow-md hover:bg-blue-800 hover:-translate-y-0.5 transition-all flex items-center gap-2"
+          class="px-5 py-2.5 rounded-full font-semibold text-sm bg-black/5 dark:bg-white/5 backdrop-blur text-slate-900 dark:text-slate-100 border border-black/5 dark:border-white/10 shadow-md hover:bg-black/10 dark:hover:bg-white/10 hover:-translate-y-0.5 transition-all flex items-center gap-2"
         >
           @config(qrcode.button.switchCam)
         </button>
         <button
           type="button"
           id="stopCamBtn"
-          class="px-5 py-2.5 rounded-full font-semibold text-sm bg-slate-800/90 backdrop-blur text-slate-100 border border-slate-700 shadow-md hover:bg-blue-800 hover:-translate-y-0.5 transition-all flex items-center gap-2"
+          class="px-5 py-2.5 rounded-full font-semibold text-sm bg-black/5 dark:bg-white/5 backdrop-blur text-slate-900 dark:text-slate-100 border border-black/5 dark:border-white/10 shadow-md hover:bg-black/10 dark:hover:bg-white/10 hover:-translate-y-0.5 transition-all flex items-center gap-2"
         >
           @config(qrcode.button.stopCam)
         </button>
         <button
           type="button"
           id="startCamBtn"
-          class="px-5 py-2.5 rounded-full font-semibold text-sm bg-slate-800/90 backdrop-blur text-slate-100 border border-slate-700 shadow-md hover:bg-blue-800 hover:-translate-y-0.5 transition-all flex items-center gap-2"
+          class="px-5 py-2.5 rounded-full font-semibold text-sm bg-black/5 dark:bg-white/5 backdrop-blur text-slate-900 dark:text-slate-100 border border-black/5 dark:border-white/10 shadow-md hover:bg-black/10 dark:hover:bg-white/10 hover:-translate-y-0.5 transition-all flex items-center gap-2"
         >
           @config(qrcode.button.startCam)
         </button>
@@ -98,10 +125,10 @@
         <label
           id="dropZone"
           for="fileInput"
-          class="flex flex-col items-center justify-center gap-2 p-4 transition border-2 border-dashed cursor-pointer border-slate-600 rounded-2xl hover:border-blue-400 hover:bg-slate-800/40"
+          class="flex flex-col items-center justify-center gap-2 p-4 transition border-2 border-dashed cursor-pointer border-black/10 dark:border-white/10 rounded-2xl hover:border-neon-blue dark:hover:border-neon-blue hover:bg-black/5 dark:hover:bg-white/5"
         >
           <span class="text-2xl">📂</span>
-          <span class="text-sm text-slate-300"
+          <span class="text-sm text-slate-500 dark:text-slate-300"
             >@config(qrcode.text.scanFromFile)</span
           >
         </label>
@@ -112,7 +139,7 @@
       <!-- Notification -->
       <div
         id="notifContainer"
-        class="z-40 flex flex-col items-center w-full gap-3 px-4 py-3 mt-4 text-sm font-medium border-l-4 rounded-full backdrop-blur-md animate-slide-in"
+        class="z-40 hidden flex-col items-center justify-center w-full gap-3 mt-4 text-sm font-medium rounded-lg animate-slide-in"
       ></div>
 
       <!-- Result Card -->
@@ -153,16 +180,20 @@
     // Helper functions
     function getNotificationStyle(type) {
       const styles = {
-        success: 'bg-green-500/20 border-green-500 text-green-100',
-        error: 'bg-red-500/20 border-red-500 text-red-100',
-        warning: 'bg-amber-500/20 border-amber-500 text-amber-100',
-        info: 'bg-blue-500/20 border-blue-500 text-blue-100',
+        success: 'bg-green-500/10 border-green-500 text-green-600 dark:text-green-400',
+        error: 'bg-red-500/10 border-red-500 text-red-600 dark:text-red-400',
+        warning: 'bg-amber-500/10 border-amber-500 text-amber-600 dark:text-amber-400',
+        info: 'bg-blue-500/10 border-blue-500 text-blue-600 dark:text-blue-400',
       };
 
-      return `py-3 px-4 w-full rounded-full font-medium flex items-center gap-3 text-sm backdrop-blur-md border-l-4 animate-slide-in ${styles[type] || styles.info}`;
+      return `py-3 px-4 w-full rounded-lg font-medium flex items-center gap-3 text-sm backdrop-blur-md border-l-4 animate-slide-in ${styles[type] || styles.info}`;
     }
 
     function showNotification(message, type = 'info') {
+      if (notifContainer.classList.contains('hidden')) {
+        notifContainer.classList.remove('hidden');
+        notifContainer.classList.add('flex');
+      }
       const notif = document.createElement('div');
       notif.className = getNotificationStyle(type);
 
@@ -170,7 +201,7 @@
         type === 'success'
           ? '✅'
           : type === 'error'
-            ? '⚠️'
+            ? '⛔'
             : type === 'warning'
               ? '⚠️'
               : 'ℹ️';
@@ -191,6 +222,9 @@
 
           setTimeout(() => {
             notif.remove();
+            if (notifContainer.children.length === 0) {
+              notifContainer.classList.add('hidden');
+            }
           }, 300);
         },
         type === 'error' ? 4000 : 2800
@@ -199,12 +233,15 @@
       // remove when click
       notif.addEventListener('click', () => {
         notif.remove();
+        if (notifContainer.children.length === 0) {
+          notifContainer.classList.add('hidden');
+        }
       });
 
       // maximum 4 notifs
       const maxNotif = 4;
       if (notifContainer.children.length > maxNotif) {
-        notifContainer.firstChild.remsove();
+        notifContainer.removeChild(notifContainer.lastChild);
       }
     }
 
@@ -303,7 +340,7 @@
         if (isHotspot && wifiPass) {
           const copyBtn = document.createElement('button');
           copyBtn.className =
-            'bg-slate-700 border-none rounded-full px-5 py-2 text-white font-semibold text-sm cursor-pointer transition-all hover:scale-95 inline-flex items-center gap-1.5';
+            'bg-black/5 dark:bg-white/5 border border-black/5 dark:border-white/10 rounded-full px-5 py-2 text-slate-900 dark:text-white font-semibold text-sm cursor-pointer transition-all hover:scale-95 inline-flex items-center gap-1.5';
           copyBtn.innerHTML = '📋 Copy Password';
           copyBtn.onclick = () => {
             navigator.clipboard.writeText(wifiPass);
@@ -316,7 +353,7 @@
         } else if (!isUrl && !isHotspot && qrText.length > 0) {
           const copyTextBtn = document.createElement('button');
           copyTextBtn.className =
-            'bg-slate-700 border-none rounded-full px-5 py-2 text-white font-semibold text-sm cursor-pointer transition-all hover:scale-95 inline-flex items-center gap-1.5';
+            'bg-black/5 dark:bg-white/5 border border-black/5 dark:border-white/10 rounded-full px-5 py-2 text-slate-900 dark:text-white font-semibold text-sm cursor-pointer transition-all hover:scale-95 inline-flex items-center gap-1.5';
           copyTextBtn.innerHTML = '📋 Copy Teks';
           copyTextBtn.onclick = () => {
             navigator.clipboard.writeText(qrText);
@@ -359,7 +396,10 @@
         showNotification('@config(qrcode.notifications.camStart)', 'info');
       } catch (err) {
         console.error('Start camera failed:', err);
-        showNotification('@config(qrcode.notifications.camFailed)', 'error');
+        showNotification(
+          `@config(qrcode.notifications.camFailed): ${err}`,
+          'error'
+        );
         html5QrCode = null;
         isScanning = false;
       }
@@ -458,14 +498,14 @@
     // effect when drag in
     ['dragenter', 'dragover'].forEach((eventName) => {
       dropZone.addEventListener(eventName, () => {
-        dropZone.classList.add('border-blue-400', 'bg-slate-800/40');
+        dropZone.classList.add('border-neon-blue', 'bg-black/5', 'dark:bg-white/5');
       });
     });
 
     // back to default when out
     ['dragleave', 'drop'].forEach((eventName) => {
       dropZone.addEventListener(eventName, () => {
-        dropZone.classList.remove('border-blue-400', 'bg-slate-800/40');
+        dropZone.classList.remove('border-neon-blue', 'bg-black/5', 'dark:bg-white/5');
       });
     });
 
@@ -521,7 +561,7 @@
         } 
       } catch (err) {
         console.error('Scan file error:', err);
-        showNotification('@config(qrcode.notifications.qrNotFound)', 'error');
+        showNotification(`@config(qrcode.notifications.qrNotFound): ${err}`, 'error');
         // resultCard.style.display = "none";
       } finally {
         try {
@@ -587,7 +627,7 @@
           initAndStartCamera().catch((err) => {
             console.error('Init camera failed:', err);
             showNotification(
-              "@config(qrcode.notifications.camInitFailed)",
+              `@config(qrcode.notifications.camInitFailed): ${err}`,
               "info"
             );
           });
