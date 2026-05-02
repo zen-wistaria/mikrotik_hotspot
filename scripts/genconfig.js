@@ -16,10 +16,42 @@ const DEFAULT_CONFIG = {
     },
     {
       title: '1 Minggu',
-      price: 'Rp. 5000'
-    }
+      price: 'Rp. 5000',
+    },
   ],
   errors_lang: 'en',
+  qrcode: {
+    meta: {
+      title: 'Wi.Fi | QR Code Scanner',
+      description: 'Scan QR codes to log in to hotspot',
+    },
+    title: 'QR Code Scanner',
+    description:
+      'Point the QR code to the camera area • Auto redirect for links',
+    button: {
+      switchCam: 'Switch Camera',
+      startCam: 'Start Camera',
+      stopCam: 'Stop Camera',
+    },
+    text: {
+      scanFromFile: 'Drag/Upload QR Code voucher from file/image',
+    },
+    notifications: {
+      qrInvalid: 'QR code is empty or invalid',
+      qrSuccess: 'Valid QR Code! Authenticating...',
+      qrNotFound: 'QR code not found',
+      camStart: 'Camera is active...',
+      camAlreadyActive: 'Camera is already active',
+      camInitFailed: 'Click Start to activate the camera',
+      camStop: 'Camera stopped',
+      camFailed: 'Failed to access camera',
+      camInvalid: 'Camera is not active, please start it first',
+      camNotAvailable: 'No other camera available',
+      camSwitching: 'Switching camera',
+      camSwitchingFailed: 'Failed to switch camera',
+    },
+    footer: '✦ Auto QR • Automatically logs in after scan ✦',
+  },
   alogin: {
     meta: {
       title: 'Wi.Fi | Redirecting',
