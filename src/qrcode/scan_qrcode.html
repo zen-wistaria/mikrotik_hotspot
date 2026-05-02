@@ -1,0 +1,131 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <title>QR Hotspot Scanner</title>
+
+  <!-- <script src="https://unpkg.com/html5-qrcode"></script> -->
+   <script src="../js/qrcode.js"></script>
+</head>
+<body>
+
+<h2>Scan QR Hotspot</h2>
+
+<div id="reader"></div>
+
+<!-- <button type="button" onclick="startCamera()">Start Kamera</button> -->
+<button type="button"  onclick="switchCamera()">Switch Kamera</button>
+<button type="button"  onclick="stopCamera()">Stop</button>
+
+<br><br>
+
+<input type="file" id="fileInput" accept="image/*">
+
+<div id="notif" class="notif"></div>
+
+<!-- <script src="../js/scan_qr.js"></script> -->
+<script>
+    let html5QrCode;
+    let currentFacing = "environment";
+
+    const notif = document.getElementById("notif");
+    const fileInput = document.getElementById("fileInput");
+
+    // Notifikasi
+    function showNotif(message, type = "error") {
+      notif.innerText = message;
+      notif.className = `notif ${type}`;
+      notif.style.display = "block";
+    
+      setTimeout(() => {
+        notif.style.display = "none";
+      }, 3000);
+    }
+
+    // Validasi URL
+    function isValidURL(str) {
+      try {
+        new URL(str);
+        return true;
+      } catch {
+        return false;
+      }
+    }
+
+    // Handle hasil QR
+    function handleResult(decodedText) {
+      console.log("QR Result:", decodedText);
+    
+      if (isValidURL(decodedText)) {
+        showNotif("Redirecting...", "success");
+      
+        setTimeout(() => {
+          window.location.href = decodedText;
+        }, 1000);
+      } else {
+        showNotif("QR Code tidak valid");
+      }
+    }
+
+    // Start kamera
+    function startCamera() {
+      html5QrCode = new Html5Qrcode("reader");
+    
+      html5QrCode.start(
+        { facingMode: currentFacing },
+        { fps: 10, qrbox: 250 },
+        handleResult
+      ).catch(err => {
+        console.error(err);
+        showNotif("Gagal mengakses kamera");
+      });
+    }
+
+    // Stop kamera
+    function stopCamera() {
+      if (html5QrCode) {
+        html5QrCode.stop().then(() => {
+          console.log("Camera stopped");
+        });
+      }
+    }
+
+    // Switch kamera
+    function switchCamera() {
+      currentFacing = currentFacing === "environment" ? "user" : "environment";
+    
+      if (html5QrCode) {
+        stopCamera();
+        setTimeout(startCamera, 500);
+      }
+    }
+
+    // Scan dari file gambar
+    fileInput.addEventListener("change", (e) => {
+      const file = e.target.files[0];
+      if (!file) return;
+    
+      // Stop kamera kalau lagi jalan
+      if (html5QrCode) {
+        html5QrCode.stop().catch(() => {});
+      }
+    
+      const qr = new Html5Qrcode("reader");
+    
+      qr.scanFile(file, true)
+        .then(decodedText => {
+          handleResult(decodedText);
+        })
+        .catch(err => {
+          console.error(err);
+          showNotif("QR tidak terdeteksi di gambar");
+        });
+    });
+    
+    document.addEventListener("DOMContentLoaded", () => {
+        startCamera();
+    });
+</script>
+
+</body>
+</html>
