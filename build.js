@@ -294,6 +294,9 @@ async function minifyHTML(html) {
 function generateHash(content) {
   return crypto.createHash('md5').update(content).digest('hex').slice(0, 8);
 }
+function escapeRegex(str) {
+  return str.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+}
 
 /**
  * Build Tailwind CSS + hash
@@ -364,15 +367,19 @@ async function processHTMLFiles(cssFileName, jsMapping) {
 
     // replace CSS
     content = content.replace(
-      /(href=["']css\/)style\.css(["'])/g,
+      /(href=["'](?:\.\.\/|\.\/)*css\/)style\.css(["'])/g,
       `$1${cssFileName}$2`
     );
 
     // replace JS
     for (const [oldRef, newRef] of Object.entries(jsMapping)) {
+      const escaped = escapeRegex(oldRef);
+
       content = content.replace(
-        new RegExp(`src=["']${oldRef}["']`, 'g'),
-        `src="${newRef}"`
+        new RegExp(`(src=["'])(\\.{1,2}\\/)*${escaped}(["'])`, 'g'),
+        (match, p1, p2, p3) => {
+          return `${p1}${p2 || ""}${newRef}${p3}`;
+        }
       );
     }
 
