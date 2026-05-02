@@ -328,7 +328,9 @@ async function buildTailwind() {
  * Process JS (minify + hash)
  */
 async function processJSFiles() {
-  const files = glob.sync(`${SRC_DIR}/**/*.js`);
+  const files = glob.sync(`${SRC_DIR}/**/*.js`, {
+    ignore: [`${SRC_DIR}/partials/**/*`, `${SRC_DIR}/qrcode/**/*`],
+  });
   const mapping = {};
 
   for (const file of files) {
@@ -359,7 +361,7 @@ async function processHTMLFiles(cssFileName, jsMapping) {
   const config = await loadConfig();
 
   const files = glob.sync(`${SRC_DIR}/**/*.html`, {
-    ignore: [`${SRC_DIR}/partials/**/*`],
+    ignore: [`${SRC_DIR}/partials/**/*`, `${SRC_DIR}/qrcode/**/*`],
   });
 
   for (const file of files) {
@@ -377,7 +379,7 @@ async function processHTMLFiles(cssFileName, jsMapping) {
 
       content = content.replace(
         new RegExp(`(src=["'])(\\.{1,2}\\/)*${escaped}(["'])`, 'g'),
-        (match, p1, p2, p3) => {
+        (_match, p1, p2, p3) => {
           return `${p1}${p2 || ""}${newRef}${p3}`;
         }
       );
@@ -413,6 +415,7 @@ async function copyOtherFiles() {
       `${SRC_DIR}/**/*.js`,
       `${SRC_DIR}/**/*.css`,
       `${SRC_DIR}/partials/**/*`,
+      `${SRC_DIR}/qrcode/**/*`,
     ],
   });
 
