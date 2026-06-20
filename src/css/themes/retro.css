@@ -1,0 +1,183 @@
+/* ============================================
+   Theme: Monochrome
+   Black & white cyberpunk — crisp, boxy, sharp
+   No gradients, no glow, pure contrast.
+   ============================================ */
+
+:root {
+  --clr-primary: #000000;
+  --clr-primary-rgb: 0, 0, 0;
+  --clr-accent: #ffffff;
+  --clr-accent-rgb: 255, 255, 255;
+  --clr-surface: #000000;
+  --clr-surface-alt: #111111;
+  --clr-light: #ffffff;
+  --clr-mesh-1: rgba(0, 0, 0, 0.06);
+  --clr-mesh-2: rgba(0, 0, 0, 0.03);
+  --clr-glow: rgba(0, 0, 0, 0.15);
+  --clr-glow-hover: rgba(0, 0, 0, 0.25);
+  --clr-body-bg: #ffffff;
+  --clr-body-text: #000000;
+  --clr-radius-lg: 0;
+  --clr-radius-btn: 0;
+  --clr-radius-input: 0;
+  --clr-radius-sm: 0;
+  --clr-font: 'Outfit', system-ui, -apple-system, sans-serif;
+}
+
+.dark {
+  --clr-primary: #ffffff;
+  --clr-accent: #000000;
+  --clr-surface-alt: #222222;
+  --clr-mesh-1: rgba(255, 255, 255, 0.06);
+  --clr-mesh-2: rgba(255, 255, 255, 0.03);
+  --clr-glow: rgba(255, 255, 255, 0.15);
+  --clr-glow-hover: rgba(255, 255, 255, 0.25);
+  --clr-body-bg: #000000;
+  --clr-body-text: #ffffff;
+}
+
+/* Override Tailwind hardcoded */
+.bg-slate-50 { background-color: var(--clr-body-bg); }
+.text-slate-900 { color: var(--clr-body-text); }
+.text-cyan-500 { color: var(--clr-primary); }
+.font-\[\'Outfit\'\2c sans-serif\] { font-family: var(--clr-font, 'Outfit', system-ui, -apple-system, sans-serif); }
+
+/* ── Light mode ── */
+
+/* Card — solid white, 2px border, hard shadow */
+.glass-card {
+  background: #ffffff !important;
+  backdrop-filter: none !important;
+  border: 2px solid #000 !important;
+  box-shadow: 4px 4px 0 0 #000 !important;
+}
+
+/* Button — black fill, white text, hard shadow */
+.neon-btn {
+  background: #000 !important;
+  border: 2px solid #000 !important;
+  box-shadow: 3px 3px 0 0 #000 !important;
+  color: #fff !important;
+}
+.neon-btn:hover {
+  box-shadow: 5px 5px 0 0 #000 !important;
+  transform: translate(-1px, -1px) !important;
+}
+.neon-btn:active {
+  box-shadow: 1px 1px 0 0 #000 !important;
+  transform: translate(1px, 1px) !important;
+}
+
+/* Input — white bg, 2px border, tiny shadow */
+.input-field {
+  border: 2px solid #000 !important;
+  background: #fff !important;
+  box-shadow: 2px 2px 0 0 #000 !important;
+}
+.input-field:focus {
+  border-color: #000 !important;
+  box-shadow: 3px 3px 0 0 #000 !important;
+}
+
+/* Stat card */
+.stat-card {
+  border: 2px solid #000 !important;
+  box-shadow: 2px 2px 0 0 #000 !important;
+}
+
+/* Tabs */
+.tab-btn[data-active="true"] {
+  background: #000 !important;
+  color: #fff !important;
+}
+.tab-btn[data-active="false"] {
+  background: transparent !important;
+  color: #000 !important;
+}
+
+/* Boxy everything */
+[class*="rounded-"], button, .theme-toggle, .glass-card,
+.neon-btn, .input-field, .stat-card { border-radius: 0 !important; }
+
+/* Theme toggle */
+.theme-toggle {
+  border: 2px solid #000 !important;
+  box-shadow: 2px 2px 0 0 #000 !important;
+}
+
+/* Background */
+.bg-mesh { background: #f5f5f5 !important; }
+.bg-mesh::before { opacity: 0.15 !important; }
+.bg-mesh::after { display: none !important; }
+
+/* Spinner — square with black borders */
+.animate-spin {
+  border-radius: 0 !important;
+  border-right-color: #000 !important;
+  border-left-color: transparent !important;
+  border-top-color: #000 !important;
+  border-bottom-color: #000 !important;
+}
+.animate-ping { border-radius: 0 !important; }
+
+/* Error box — no red, just black border */
+.bg-red-500\/10 { background: #f5f5f5 !important; }
+.border-red-500, .border-l-4 { border-color: #000 !important; }
+.text-red-500 { color: #000 !important; }
+
+/* Yellow/green decorative icons → black outline */
+.text-yellow-500 { color: #000 !important; }
+.fill-yellow-500 { fill: #000 !important; }
+
+/* Secondary text stays visible gray */
+.text-slate-500, .text-slate-400 { opacity: 0.55; }
+
+/* ── Dark mode ── */
+.dark .bg-slate-50, .dark body, body.dark { background: #000 !important; }
+body.dark { color: #fff !important; }
+
+.dark .glass-card {
+  background: #000 !important;
+  border-color: #fff !important;
+  box-shadow: 4px 4px 0 0 #fff !important;
+}
+
+.dark .neon-btn {
+  background: #fff !important;
+  border-color: #fff !important;
+  box-shadow: 3px 3px 0 0 #fff !important;
+  color: #000 !important;
+}
+.dark .neon-btn:hover { box-shadow: 5px 5px 0 0 #fff !important; }
+
+.dark .input-field {
+  border-color: #fff !important;
+  background: #111 !important;
+  box-shadow: 2px 2px 0 0 #fff !important;
+  color: #fff !important;
+}
+.dark .input-field:focus { box-shadow: 3px 3px 0 0 #fff !important; }
+
+.dark .stat-card {
+  border-color: #fff !important;
+  box-shadow: 2px 2px 0 0 #fff !important;
+}
+
+.dark .tab-btn[data-active="true"] {
+  background: #fff !important;
+  color: #000 !important;
+}
+.dark .tab-btn[data-active="false"] { color: #fff !important; }
+
+.dark .theme-toggle {
+  border-color: #fff !important;
+  box-shadow: 2px 2px 0 0 #fff !important;
+}
+
+.dark .bg-mesh { background: #0a0a0a !important; }
+
+.dark .bg-red-500\/10 { background: #222 !important; }
+.dark .text-red-500 { color: #fff !important; }
+.dark .text-yellow-500 { color: #fff !important; }
+.dark .fill-yellow-500 { fill: #fff !important; }

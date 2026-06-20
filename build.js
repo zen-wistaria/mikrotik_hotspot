@@ -393,6 +393,17 @@ async function processHTMLFiles(cssFileName, jsMapping) {
     content = await processIfDirectives(content, config);
     content = await processIncludes(baseDir, content, config);
 
+    // inject theme CSS
+    const theme = config.theme || 'neon';
+    const themePath = path.join(SRC_DIR, 'css/themes', `${theme}.css`);
+    if (await fs.pathExists(themePath)) {
+      const themeCss = await fs.readFile(themePath, 'utf8');
+      content = content.replace(
+        '</head>',
+        `<style>${themeCss}</style></head>`
+      );
+    }
+
     const minified = await minifyHTML(content);
 
     const dest = path.join(RESULT_DIR, path.relative(SRC_DIR, file));

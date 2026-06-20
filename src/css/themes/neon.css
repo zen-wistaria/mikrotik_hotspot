@@ -1,0 +1,40 @@
+/* ============================================
+   Theme: Neon (Default)
+   Modern cyberpunk — blue/purple glow aesthetic
+   ============================================ */
+
+:root {
+  --clr-primary: #00d2ff;
+  --clr-primary-rgb: 0, 210, 255;
+  --clr-accent: #9d50bb;
+  --clr-accent-rgb: 157, 80, 187;
+  --clr-surface: #0a0b10;
+  --clr-surface-alt: #1a1b23;
+  --clr-light: #ffffff;
+  --clr-mesh-1: rgba(0, 210, 255, 0.1);
+  --clr-mesh-2: rgba(157, 80, 187, 0.1);
+  --clr-glow: rgba(0, 210, 255, 0.4);
+  --clr-glow-hover: rgba(0, 210, 255, 0.6);
+  --clr-body-bg: #f8fafc;
+  --clr-body-text: #0f172a;
+  --clr-radius-lg: 1.5rem;
+  --clr-radius-btn: 0.75rem;
+  --clr-radius-input: 0.75rem;
+  --clr-radius-sm: 1rem;
+}
+
+/* Override Tailwind hardcoded body classes (light mode default) */
+.bg-slate-50 {
+  background-color: var(--clr-body-bg);
+}
+.text-slate-900 {
+  color: var(--clr-body-text);
+}
+.font-\[\'Outfit\'\2c sans-serif\] {
+  font-family: var(--clr-font, 'Outfit', system-ui, -apple-system, sans-serif);
+}
+
+/* Override brand/logo text — follows theme color */
+.text-cyan-500 {
+  color: var(--clr-primary);
+}

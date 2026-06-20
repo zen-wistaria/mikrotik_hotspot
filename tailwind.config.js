@@ -4,10 +4,13 @@ export default {
   theme: {
     extend: {
       colors: {
-        'neon-blue': '#00d2ff',
-        'neon-purple': '#9d50bb',
-        'dark-primary': '#0a0b10',
-        'dark-secondary': '#1a1b23',
+        'neon-blue': 'var(--clr-primary)',
+        'neon-purple': 'var(--clr-accent)',
+        'dark-primary': 'var(--clr-surface)',
+        'dark-secondary': 'var(--clr-surface-alt)',
+      },
+      cyan: {
+        500: 'var(--clr-primary)',
       },
       animation: {
         'fade-in-up': 'fadeInUp 0.6s cubic-bezier(0.16, 1, 0.3, 1)',
