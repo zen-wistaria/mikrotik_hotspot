@@ -1,0 +1,37 @@
+/* ============================================
+   Theme: Crimson
+   Bold ruby/rose — red/coral/pink
+   Light: soft pink, bold red accent
+   Dark: wine dark, rose glow
+   ============================================ */
+
+:root {
+  --clr-primary: #DC2626;
+  --clr-primary-rgb: 220, 38, 38;
+  --clr-accent: #E11D48;
+  --clr-accent-rgb: 225, 29, 72;
+  --clr-surface: #1a0a0a;
+  --clr-surface-alt: #2d1414;
+  --clr-light: #FFF5F5;
+  --clr-mesh-1: rgba(220, 38, 38, 0.08);
+  --clr-mesh-2: rgba(225, 29, 72, 0.05);
+  --clr-glow: rgba(220, 38, 38, 0.35);
+  --clr-glow-hover: rgba(220, 38, 38, 0.55);
+  --clr-body-bg: #FFF5F5;
+  --clr-body-text: #1a0a0a;
+
+  --radius-btn: 9999px;
+  --radius-card: 1.25rem;
+  --radius-stat: 0.75rem;
+  --radius-input: 9999px;
+  --radius-tab-bar: 9999px;
+  --radius-tab: 9999px;
+  --btn-bg: linear-gradient(135deg, #DC2626, #E11D48);
+  --btn-text: #ffffff;
+  --btn-shadow: 0 0 15px rgba(220, 38, 38, 0.4);
+  --btn-shadow-hover: 0 0 25px rgba(220, 38, 38, 0.6);
+}
+
+.bg-slate-50 { background-color: var(--clr-body-bg); }
+.text-slate-900 { color: var(--clr-body-text); }
+.font-\[\'Outfit\'\2c sans-serif\] { font-family: var(--clr-font, 'Outfit', system-ui, -apple-system, sans-serif); }

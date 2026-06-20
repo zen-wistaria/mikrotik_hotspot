@@ -1,0 +1,37 @@
+/* ============================================
+   Theme: Lavender
+   Royal purple/violet — plum/iris/indigo
+   Light: soft lilac, bold violet accent
+   Dark: deep purple, violet glow
+   ============================================ */
+
+:root {
+  --clr-primary: #7C3AED;
+  --clr-primary-rgb: 124, 58, 237;
+  --clr-accent: #A855F7;
+  --clr-accent-rgb: 168, 85, 247;
+  --clr-surface: #130e1a;
+  --clr-surface-alt: #21182d;
+  --clr-light: #FAF5FF;
+  --clr-mesh-1: rgba(124, 58, 237, 0.08);
+  --clr-mesh-2: rgba(168, 85, 247, 0.05);
+  --clr-glow: rgba(124, 58, 237, 0.35);
+  --clr-glow-hover: rgba(124, 58, 237, 0.55);
+  --clr-body-bg: #FAF5FF;
+  --clr-body-text: #130e1a;
+
+  --radius-btn: 0.75rem;
+  --radius-card: 1.5rem;
+  --radius-stat: 1rem;
+  --radius-input: 0.75rem;
+  --radius-tab-bar: 0.75rem;
+  --radius-tab: 0.5rem;
+  --btn-bg: linear-gradient(135deg, #7C3AED, #A855F7);
+  --btn-text: #ffffff;
+  --btn-shadow: 0 0 15px rgba(124, 58, 237, 0.4);
+  --btn-shadow-hover: 0 0 25px rgba(124, 58, 237, 0.6);
+}
+
+.bg-slate-50 { background-color: var(--clr-body-bg); }
+.text-slate-900 { color: var(--clr-body-text); }
+.font-\[\'Outfit\'\2c sans-serif\] { font-family: var(--clr-font, 'Outfit', system-ui, -apple-system, sans-serif); }
