@@ -1,0 +1,16 @@
+/* ============================================
+   Component: Typography
+   .stat-label  → label for stats data
+   .stat-value  → value display for stats
+   ============================================ */
+
+@layer components {
+  .stat-label {
+    @apply text-[10px] text-slate-500 dark:text-white/50 uppercase tracking-widest flex items-center gap-1.5 mb-1;
+  }
+
+  .stat-value {
+    @apply text-sm font-extrabold;
+    color: var(--clr-primary);
+  }
+}

@@ -309,7 +309,27 @@ async function buildTailwind() {
 
   await fs.ensureDir(path.dirname(tempCss));
 
-  execSync(`npx tailwindcss -i "${inputCss}" -o "${tempCss}" --minify`, {
+  // Concat component files + input.css to resolve @import manually
+  let baseCss = await fs.readFile(inputCss, 'utf8');
+
+  // Replace @import './components/_*.css' with actual file contents
+  baseCss = baseCss.replace(
+    /@import\s+'\.\/components\/_([^']+)';/g,
+    (_, name) => {
+      const compPath = path.join(SRC_DIR, 'css/components', `_${name}`);
+      if (fs.existsSync(compPath)) {
+        return fs.readFileSync(compPath, 'utf8');
+      }
+      console.warn(`⚠️ Component CSS not found: _${name}`);
+      return '';
+    }
+  );
+
+  // Write resolved CSS to temp, then run Tailwind on it
+  const resolvedCss = path.join(RESULT_DIR, 'css/style.resolved.css');
+  await fs.writeFile(resolvedCss, baseCss);
+
+  execSync(`npx tailwindcss -i "${resolvedCss}" -o "${tempCss}" --minify`, {
     stdio: 'inherit',
   });
 
@@ -320,6 +340,7 @@ async function buildTailwind() {
   const finalPath = path.join(RESULT_DIR, 'css', finalName);
 
   await fs.move(tempCss, finalPath, { overwrite: true });
+  await fs.remove(resolvedCss);
 
   return finalName;
 }

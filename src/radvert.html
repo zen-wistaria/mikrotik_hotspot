@@ -47,15 +47,15 @@
 
   <!-- Loader -->
   <div id="loader" class="fixed inset-0 bg-slate-50 dark:bg-dark-primary z-1000 hidden items-center justify-center">
-    <div class="w-12 h-12 border-4 border-black/10 dark:border-white/10 border-t-neon-blue rounded-full animate-spin">
+    <div class="w-12 h-12 border-4 border-black/10 dark:border-white/10 border-t-brand rounded-full animate-spin">
     </div>
   </div>
 
   <div class="glass-card">
     <div class="text-center mb-10">
       <div
-        class="w-16 h-16 bg-cyan-500/10 border border-cyan-500/20 rounded-2xl flex items-center justify-center mx-auto mb-4 animate-float">
-        <svg xmlns="http://www.w3.org/2000/svg" class="w-8 h-8 text-cyan-500" viewBox="0 0 24 24" fill="none"
+        class="w-16 h-16 bg-brand-muted border border-brand-muted rounded-2xl flex items-center justify-center mx-auto mb-4 animate-float">
+        <svg xmlns="http://www.w3.org/2000/svg" class="w-8 h-8 text-brand" viewBox="0 0 24 24" fill="none"
           stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
           <rect x="3" y="4" width="18" height="12" rx="2" />
           <path d="M7 20h10" />
@@ -65,7 +65,7 @@
           <path d="M16 8h1" />
         </svg>
       </div>
-      <h1 class="text-3xl font-semibold tracking-widest text-cyan-500 dark:text-neon-blue bg-clip-text uppercase">
+      <h1 class="text-3xl font-semibold tracking-widest text-brand bg-clip-text uppercase">
         @config('radvert.title')
       </h1>
       <p class="text-[10px] text-slate-400 dark:text-white/70 mt-1 uppercase tracking-widest leading-relaxed">
@@ -74,7 +74,7 @@
     </div>
 
     <div class="flex justify-center mb-8">
-      <div class="w-12 h-12 border-4 border-black/5 dark:border-white/10 border-t-cyan-500 rounded-full animate-spin">
+      <div class="w-12 h-12 border-4 border-black/5 dark:border-white/10 border-t-brand rounded-full animate-spin">
       </div>
     </div>
 
@@ -82,10 +82,10 @@
       class="bg-black/5 dark:bg-white/5 p-4 rounded-xl text-xs font-semibold font-mono text-slate-500 dark:text-white/60 mb-8 text-center leading-relaxed italic">
       If nothing happens, open
       <a href="$(link-redirect)" target="hotspot_advert"
-        class="text-cyan-500 dark:text-neon-blue font-bold hover:underline">advertisement manually</a>.
+        class="text-brand font-bold hover:underline">advertisement manually</a>.
     </div>
 
-    <button class="neon-btn group uppercase tracking-widest text-xs italic" onclick="openOrig()" type="button">
+    <button class="btn-primary group uppercase tracking-widest text-xs italic" onclick="openOrig()" type="button">
       @config('radvert.button')
       <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4 transition-transform group-hover:translate-x-1"
         viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"

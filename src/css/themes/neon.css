@@ -17,24 +17,21 @@
   --clr-glow-hover: rgba(0, 210, 255, 0.6);
   --clr-body-bg: #f8fafc;
   --clr-body-text: #0f172a;
-  --clr-radius-lg: 1.5rem;
-  --clr-radius-btn: 0.75rem;
-  --clr-radius-input: 0.75rem;
-  --clr-radius-sm: 1rem;
+
+  /* component variables */
+  --radius-btn: 0.75rem;
+  --radius-card: 1.5rem;
+  --radius-stat: 1rem;
+  --radius-input: 0.75rem;
+  --radius-tab-bar: 0.75rem;
+  --radius-tab: 0.5rem;
+  --btn-bg: linear-gradient(to bottom right, var(--clr-primary), var(--clr-accent));
+  --btn-text: #ffffff;
+  --btn-shadow: 0 0 15px var(--clr-glow);
+  --btn-shadow-hover: 0 0 25px var(--clr-glow-hover);
 }
 
-/* Override Tailwind hardcoded body classes (light mode default) */
-.bg-slate-50 {
-  background-color: var(--clr-body-bg);
-}
-.text-slate-900 {
-  color: var(--clr-body-text);
-}
-.font-\[\'Outfit\'\2c sans-serif\] {
-  font-family: var(--clr-font, 'Outfit', system-ui, -apple-system, sans-serif);
-}
-
-/* Override brand/logo text — follows theme color */
-.text-cyan-500 {
-  color: var(--clr-primary);
-}
+/* Override Tailwind hardcoded body classes */
+.bg-slate-50 { background-color: var(--clr-body-bg); }
+.text-slate-900 { color: var(--clr-body-text); }
+.font-\[\'Outfit\'\2c sans-serif\] { font-family: var(--clr-font, 'Outfit', system-ui, -apple-system, sans-serif); }

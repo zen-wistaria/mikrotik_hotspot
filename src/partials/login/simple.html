@@ -5,7 +5,7 @@
 
         <div class="space-y-4">
             $(if trial == 'yes')
-            <button class="text-xs italic tracking-widest uppercase neon-btn group"
+            <button class="text-xs italic tracking-widest uppercase btn-primary group"
                 onclick="window.location.href = 'trials.html'" type="button">
                 <svg xmlns="http://www.w3.org/2000/svg"
                     class="w-4 h-4 text-yellow-500 fill-yellow-500 group-hover:animate-pulse" viewBox="0 0 24 24">
@@ -16,7 +16,7 @@
             <button id="btn-authenticate"
                 class="flex items-center justify-center w-full gap-3 py-4 text-xs italic font-bold tracking-widest uppercase transition-all border bg-white/5 border-black/5 dark:border-white/10 rounded-xl hover:bg-black/5 dark:hover:bg-white/10 group"
                 type="button">
-                <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4 text-neon-blue" viewBox="0 0 24 24" fill="none"
+                <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4 text-brand" viewBox="0 0 24 24" fill="none"
                     stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                     <path d="M15 3h4a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2h-4" />
                     <polyline points="10 17 15 12 10 7" />
@@ -25,8 +25,8 @@
                 @config(login.buttonAuth)
             </button>
             $(else)
-            <button id="btn-authenticate" class="text-xs italic tracking-widest uppercase neon-btn group" type="button">
-                <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4 text-neon-blue" viewBox="0 0 24 24" fill="none"
+            <button id="btn-authenticate" class="text-xs italic tracking-widest uppercase btn-primary group" type="button">
+                <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4 text-brand" viewBox="0 0 24 24" fill="none"
                     stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                     <path d="M15 3h4a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2h-4" />
                     <polyline points="10 17 15 12 10 7" />
@@ -38,7 +38,7 @@
             <button
                 class="flex items-center justify-center w-full gap-3 py-4 text-xs italic font-bold tracking-widest uppercase transition-all border bg-white/5 border-black/5 dark:border-white/10 rounded-xl hover:bg-black/5 dark:hover:bg-white/10 group"
                 onclick="window.location.href='https://zen-wistaria.github.io/mikrotik-hotspot-qrscanner/'" type="button">
-                <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4 text-neon-purple" viewBox="0 0 24 24" fill="none"
+                <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4 text-accent" viewBox="0 0 24 24" fill="none"
                     stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                     <rect x="3" y="3" width="7" height="7" />
                     <rect x="14" y="3" width="7" height="7" />
@@ -71,7 +71,7 @@
                 </svg>
             </button>
             <div>
-                <h1 class="text-xl italic font-extrabold tracking-widest uppercase text-cyan-500 dark:text-neon-blue">
+                <h1 class="text-xl italic font-extrabold tracking-widest uppercase text-brand">
                     Identity
                 </h1>
                 <p class="text-[9px] text-slate-400 dark:text-white/70 uppercase tracking-widest">
@@ -141,7 +141,7 @@
                 </div>
             </div>
 
-            <button type="button" onclick="doLogin()" class="text-xs italic tracking-widest uppercase neon-btn group">
+            <button type="button" onclick="doLogin()" class="text-xs italic tracking-widest uppercase btn-primary group">
                 @config(login.buttonConnect)
                 <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4 transition-transform group-hover:translate-x-1"
                     viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"

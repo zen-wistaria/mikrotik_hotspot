@@ -1,0 +1,25 @@
+/* ============================================
+   Component: Mesh Background
+   .bg-mesh  → animated dot mesh behind content
+   ============================================ */
+
+@layer utilities {
+  .bg-mesh {
+    @apply fixed inset-0 -z-10 pointer-events-none transition-opacity duration-1000;
+    background: radial-gradient(circle at 20% 30%, var(--clr-mesh-1), transparent 40%),
+                radial-gradient(circle at 80% 70%, var(--clr-mesh-2), transparent 40%);
+  }
+
+  .bg-mesh::before {
+    content: '';
+    @apply absolute inset-0 opacity-20 dark:opacity-10;
+    background-image: radial-gradient(circle at 2px 2px, currentColor 1px, transparent 0);
+    background-size: 40px 40px;
+    mask-image: linear-gradient(to bottom, black, transparent);
+    color: rgba(0, 0, 0, 0.1);
+  }
+
+  .dark .bg-mesh::before {
+    color: rgba(255, 255, 255, 0.2);
+  }
+}

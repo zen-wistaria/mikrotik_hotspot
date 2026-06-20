@@ -1,0 +1,25 @@
+/* ============================================
+   Component: Tab
+   .tab-bar  → flex container for tabs
+   .tab-btn  → individual tab button
+   ============================================ */
+
+@layer components {
+  .tab-bar {
+    @apply flex p-1 mb-6 bg-black/5 dark:bg-white/5;
+    border-radius: var(--radius-tab-bar);
+  }
+
+  .tab-btn {
+    @apply flex-1 py-2 text-xs h-11 font-bold transition-all uppercase tracking-widest;
+    border-radius: var(--radius-tab, 0.5rem);
+  }
+
+  .tab-btn[data-active="true"] {
+    @apply bg-neon-blue text-white dark:text-black/70;
+  }
+
+  .tab-btn[data-active="false"] {
+    @apply text-slate-500 dark:text-white/50;
+  }
+}

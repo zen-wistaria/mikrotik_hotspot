@@ -42,7 +42,7 @@
     </div>
 
     <div class="mb-8">
-      <h1 class="text-3xl font-semibold tracking-widest text-cyan-500 dark:text-neon-blue bg-clip-text uppercase">
+      <h1 class="text-3xl font-semibold tracking-widest text-brand bg-clip-text uppercase">
         @config(alogin.title)
       </h1>
       <p class="text-[10px] text-slate-400 dark:text-white/70 mt-1 uppercase tracking-widest leading-relaxed">
@@ -51,16 +51,16 @@
     </div>
 
     <div class="flex justify-center mb-8">
-      <div class="w-10 h-10 border-2 border-black/5 dark:border-white/5 border-t-neon-blue rounded-full animate-spin">
+      <div class="w-10 h-10 border-2 border-black/5 dark:border-white/5 border-t-brand rounded-full animate-spin">
       </div>
     </div>
 
     <p class="text-[10px] text-slate-400 dark:text-white/50 uppercase tracking-[0.15em]">
       If you are not redirected,
       $(if popup == 'true')
-      <a href="$(link-orig)" class="text-neon-blue font-bold border-b border-neon-blue/20 hover:border-neon-blue transition-all">click here</a>
+      <a href="$(link-orig)" class="text-brand font-bold border-b border-brand-muted hover:border-neon-blue transition-all">click here</a>
       $(else)
-      <a href="$(link-status)" class="text-neon-blue font-bold border-b border-neon-blue/20 hover:border-neon-blue transition-all">click here</a>
+      <a href="$(link-status)" class="text-brand font-bold border-b border-brand-muted hover:border-neon-blue transition-all">click here</a>
       $(endif)
     </p>
     <div class="text-center mt-12 text-[9px] uppercase tracking-[0.3em] text-slate-400 dark:text-white/70">

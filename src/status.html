@@ -49,14 +49,14 @@
   <div class="glass-card">
     <div class="text-center mb-8">
       <div
-        class="w-16 h-16 bg-neon-blue/10 border border-neon-blue/20 rounded-2xl flex items-center justify-center mx-auto mb-4 animate-float">
-        <svg xmlns="http://www.w3.org/2000/svg" class="w-8 h-8 text-neon-blue" viewBox="0 0 24 24" fill="none"
+        class="w-16 h-16 bg-brand-muted border border-brand-muted rounded-2xl flex items-center justify-center mx-auto mb-4 animate-float">
+        <svg xmlns="http://www.w3.org/2000/svg" class="w-8 h-8 text-brand" viewBox="0 0 24 24" fill="none"
           stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
           <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2" />
           <circle cx="12" cy="7" r="4" />
         </svg>
       </div>
-      <h1 class="text-3xl font-semibold tracking-widest text-cyan-500 dark:text-neon-blue bg-clip-text uppercase">
+      <h1 class="text-3xl font-semibold tracking-widest text-brand bg-clip-text uppercase">
         @config(status.title)
       </h1>
       <div
@@ -155,7 +155,7 @@
 
     <form action="$(link-logout)" name="logout" onSubmit="return openLogout()">
       $(if login-by-mac != 'yes')
-      <button type="submit" class="neon-btn uppercase tracking-widest text-sm italic">
+      <button type="submit" class="btn-primary uppercase tracking-widest text-sm italic">
         @config(status.button)
         <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor"
           stroke-width="2" stroke-linecap="round" stroke-linejoin="round">

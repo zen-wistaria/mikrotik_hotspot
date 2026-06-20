@@ -27,21 +27,21 @@
 
   <!-- Loader -->
   <div id="loader" class="fixed inset-0 bg-slate-50 dark:bg-dark-primary z-1000 hidden items-center justify-center">
-    <div class="w-12 h-12 border-4 border-black/10 dark:border-white/10 border-t-neon-blue rounded-full animate-spin">
+    <div class="w-12 h-12 border-4 border-black/10 dark:border-white/10 border-t-brand rounded-full animate-spin">
     </div>
   </div>
 
   <div class="glass-card">
     <div class="text-center mb-10">
       <div
-        class="w-16 h-16 bg-neon-purple/10 border border-neon-purple/20 rounded-2xl flex items-center justify-center mx-auto mb-4 animate-float">
-        <svg xmlns="http://www.w3.org/2000/svg" class="w-8 h-8 text-neon-purple" viewBox="0 0 24 24" fill="none"
+        class="w-16 h-16 bg-accent-muted border border-accent-muted rounded-2xl flex items-center justify-center mx-auto mb-4 animate-float">
+        <svg xmlns="http://www.w3.org/2000/svg" class="w-8 h-8 text-accent" viewBox="0 0 24 24" fill="none"
           stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
           <rect x="3" y="11" width="18" height="11" rx="2" ry="2" />
           <path d="M7 11V7a5 5 0 0 1 10 0v4" />
         </svg>
       </div>
-      <h1 class="text-3xl font-semibold tracking-widest text-cyan-500 dark:text-neon-blue bg-clip-text uppercase">
+      <h1 class="text-3xl font-semibold tracking-widest text-brand bg-clip-text uppercase">
         @config('fstatus.title')
       </h1>
       <p class="text-[10px] text-slate-400 dark:text-white/70 mt-1 uppercase tracking-widest leading-relaxed">
@@ -54,7 +54,7 @@
       @config('fstatus.message')
     </div>
 
-    <button class="neon-btn group uppercase tracking-widest text-xs italic" type="button"
+    <button class="btn-primary group uppercase tracking-widest text-xs italic" type="button"
       onclick="window.location.href = '$(link-login)'">
       @config('fstatus.button')
       <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4 transition-transform group-hover:translate-x-1"
