@@ -3,8 +3,16 @@
 @tailwind utilities;
 
 @font-face {
-  font-family: 'Orbitron';
-  src: url('../fonts/orbitron-medium.woff2') format('woff2');
+  font-family: 'Space Grotesk';
+  src: url('../fonts/space-grotesk.woff2') format('woff2');
+  font-weight: 500;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: 'Outfit';
+  src: url('../fonts/outfit.woff2') format('woff2');
   font-weight: 500;
   font-style: normal;
   font-display: swap;

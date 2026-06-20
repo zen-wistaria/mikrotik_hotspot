@@ -26,11 +26,11 @@
   </script>
 </head>
 
-<body class="bg-white text-black dark:bg-black dark:text-white font-orbitron min-h-screen flex items-center justify-center overflow-x-hidden p-4"
+<body class="bg-stone-50 text-zinc-900 dark:bg-zinc-900 dark:text-stone-100 font-space min-h-screen flex items-center justify-center overflow-x-hidden p-4"
   onLoad="startClock()">
 
-  <div class="border border-black dark:border-white bg-white dark:bg-black p-6 md:p-8 w-full max-w-sm mx-auto text-center animate-fade-in-up">
-    <div class="w-16 h-16 border border-green-500 flex items-center justify-center mx-auto mb-6">
+  <div class="border-2 rounded-xl shadow-brutal dark:shadow-brutal-dark border-zinc-900 dark:border-zinc-700 bg-stone-50 dark:bg-zinc-900 p-6 md:p-8 w-full max-w-sm mx-auto text-center animate-fade-in-up">
+    <div class="w-16 h-16 border-2 rounded-xl shadow-brutal dark:shadow-brutal-dark border-green-500 flex items-center justify-center mx-auto mb-6">
       <svg xmlns="http://www.w3.org/2000/svg" class="w-10 h-10 text-green-500" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
         <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14" />
         <polyline points="22 4 12 14.01 9 11.01" />
@@ -38,7 +38,7 @@
     </div>
 
     <div class="mb-6">
-      <h1 class="text-xl font-orbitron tracking-widest text-green-600 dark:text-green-400 uppercase">
+      <h1 class="text-xl font-space tracking-widest text-green-600 dark:text-green-400 uppercase">
         @config(alogin.title)
       </h1>
       <p class="text-xs uppercase tracking-wider text-gray-500 dark:text-gray-400 mt-1">
@@ -47,15 +47,15 @@
     </div>
 
     <div class="flex justify-center mb-6">
-      <div class="w-8 h-8 border border-black dark:border-white animate-spin"></div>
+      <div class="w-8 h-8 border-2 rounded-xl shadow-brutal dark:shadow-brutal-dark border-zinc-900 dark:border-zinc-700 animate-spin"></div>
     </div>
 
     <p class="text-xs uppercase tracking-wider text-gray-500 dark:text-gray-400">
       If you are not redirected,
       $(if popup == 'true')
-      <a href="$(link-orig)" class="text-black dark:text-white font-bold underline">click here</a>
+      <a href="$(link-orig)" class="text-zinc-900 dark:text-stone-100 font-bold underline">click here</a>
       $(else)
-      <a href="$(link-status)" class="text-black dark:text-white font-bold underline">click here</a>
+      <a href="$(link-status)" class="text-zinc-900 dark:text-stone-100 font-bold underline">click here</a>
       $(endif)
     </p>
     <div class="text-center mt-10 text-xs uppercase tracking-[0.3em] text-gray-500 dark:text-gray-400">

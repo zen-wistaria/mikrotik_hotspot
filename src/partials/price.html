@@ -1,17 +1,17 @@
 <button id="price-btn" type="button"
-  class="flex items-center justify-center w-full gap-3 px-6 py-4 text-sm uppercase tracking-widest transition-colors border border-black dark:border-white text-black dark:text-white hover:bg-black hover:text-white dark:hover:bg-white dark:hover:text-black">
+  class="flex items-center justify-center w-full gap-3 px-6 py-4 text-sm uppercase tracking-widest transition-colors border-2 rounded-xl shadow-brutal dark:shadow-brutal-dark border-zinc-900 dark:border-zinc-700 text-zinc-900 dark:text-stone-100 hover:bg-zinc-800 hover:text-stone-50 active:translate-y-1 active:shadow-none dark:hover:bg-stone-50 dark:hover:text-zinc-900">
   <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4 text-current" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
     <path d="M12 2v20M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6" />
   </svg>
   @config(login.buttonPrice)
 </button>
 <div id="price-list"
-  class="hidden p-4 border border-black dark:border-white animate-fade-in-up">
+  class="hidden p-4 border-2 rounded-xl shadow-brutal dark:shadow-brutal-dark border-zinc-900 dark:border-zinc-700 animate-fade-in-up">
   <div class="flex flex-col gap-3">
     @foreach(price_lists as item)
     <div class="flex items-center justify-between text-sm uppercase tracking-widest">
       <span class="text-gray-500 dark:text-gray-400">{{ item.title }}</span>
-      <span class="text-black dark:text-white font-bold">{{ item.price }}</span>
+      <span class="text-zinc-900 dark:text-stone-100 font-bold">{{ item.price }}</span>
     </div>
     @endforeach
   </div>
