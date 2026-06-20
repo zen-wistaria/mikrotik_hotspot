@@ -2,116 +2,12 @@
 @tailwind components;
 @tailwind utilities;
 
-/* base layer */
-@layer base {
-  :root {
-    --accent-blue: #00d2ff;
-    --accent-purple: #9d50bb;
-    --text-primary: #1a1b23;
-    --text-secondary: rgba(0, 0, 0, 0.6);
-  }
-
-  .dark {
-    --text-primary: #ffffff;
-    --text-secondary: rgba(255, 255, 255, 0.6);
-  }
-
-  * {
-    @apply transition-colors duration-300 border-black/5 dark:border-white/10;
-  }
-
-  body {
-    @apply bg-slate-50 text-slate-900 dark:bg-[#0a0b10] dark:text-white font-sans min-h-screen flex items-center justify-center overflow-x-hidden p-4 transition-all;
-  }
-}
-
-/* components */
-@layer components {
-  .glass-card {
-    @apply bg-white/70 backdrop-blur-xl border border-black/5 rounded-3xl shadow-2xl p-8 w-full max-w-sm md:max-w-2xl
-           dark:bg-white/5 dark:border-white/10 dark:shadow-none;
-    animation: fadeInUp 0.6s cubic-bezier(0.16, 1, 0.3, 1);
-  }
-
-  .neon-btn {
-    @apply w-full py-4 text-white font-bold rounded-xl transition-all duration-300
-           hover:scale-[1.02] active:scale-100 flex items-center justify-center gap-2;
-    background-image: linear-gradient(to bottom right, #00d2ff, #9d50bb);
-    box-shadow: 0 0 15px rgba(0,210,255,0.4);
-  }
-
-  .neon-btn:hover {
-    box-shadow: 0 0 25px rgba(0,210,255,0.6);
-  }
-
-  .input-group {
-    @apply mb-5 space-y-2;
-  }
-
-  .input-label {
-    @apply block text-xs font-semibold text-slate-500 dark:text-white/60 ml-1 uppercase tracking-wider;
-  }
-
-  .input-field-container {
-    @apply relative flex items-center;
-  }
-
-  .input-icon {
-    @apply absolute left-4 text-slate-400 dark:text-white/40;
-  }
-
-  .input-field {
-    @apply w-full bg-black/5 border border-black/5 rounded-xl px-4 py-3 pl-12
-           text-slate-900 placeholder:text-slate-400 outline-none transition-all
-           focus:bg-white focus:ring-2
-           dark:bg-white/5 dark:border-white/10 dark:text-white dark:placeholder:text-white/30 dark:focus:bg-white/10;
-  }
-
-  .input-field:focus {
-    border-color: #00d2ff;
-    box-shadow: 0 0 0 2px rgba(0,210,255,0.2);
-  }
-
-  .stat-card {
-    @apply bg-black/5 border border-black/5 p-4 rounded-2xl dark:bg-white/5 dark:border-white/10;
-  }
-
-  .stat-label {
-    @apply text-[10px] text-slate-500 dark:text-white/50 uppercase tracking-widest flex items-center gap-1.5 mb-1;
-  }
-
-  .stat-value {
-    @apply text-sm font-extrabold;
-    color: #00d2ff;
-  }
-}
-
-/* utilities (custom animation & bg) */
-@layer utilities {
-  .bg-mesh {
-    @apply fixed inset-0 -z-10 pointer-events-none transition-opacity duration-1000;
-    background: radial-gradient(circle at 20% 30%, rgba(0, 210, 255, 0.1), transparent 40%),
-                radial-gradient(circle at 80% 70%, rgba(157, 80, 187, 0.1), transparent 40%);
-  }
-
-  .bg-mesh::before {
-    content: '';
-    @apply absolute inset-0 opacity-20 dark:opacity-10;
-    background-image: radial-gradient(circle at 2px 2px, currentColor 1px, transparent 0);
-    background-size: 40px 40px;
-    mask-image: linear-gradient(to bottom, black, transparent);
-    color: rgba(0, 0, 0, 0.1);
-  }
-
-  .dark .bg-mesh::before {
-    color: rgba(255, 255, 255, 0.2);
-  }
-}
-
-/* keyframes (manual, karena v3 tidak support @theme) */
-@keyframes glowPulse {
-  0%, 100% { filter: drop-shadow(0 0 5px rgba(0, 210, 255, 0.4)); }
-  50% { filter: drop-shadow(0 0 15px rgba(0, 210, 255, 0.8)); }
+@font-face {
+  font-family: 'Orbitron';
+  src: url('../fonts/orbitron-medium.woff2') format('woff2');
+  font-weight: 500;
+  font-style: normal;
+  font-display: swap;
 }
 
 @keyframes fadeInUp {
