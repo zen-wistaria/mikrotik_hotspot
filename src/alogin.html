@@ -4,7 +4,11 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  $(if popup == 'true')
+  <meta http-equiv="refresh" content="0; url=$(link-redirect)" />
+  $(else)
   <meta http-equiv="refresh" content="0; url=$(link-status)" />
+  $(endif)
   <meta http-equiv="pragma" content="no-cache" />
   <meta http-equiv="expires" content="-1" />
   <title>@config(alogin.meta.title)</title>
@@ -14,8 +18,10 @@
     function startClock() {
       $(if popup == 'true')
         open('$(link-status)', 'hotspot_status', 'toolbar=0,location=0,directories=0,status=0,menubars=0,resizable=1,width=290,height=200');
+        location.href = unescape('$(link-redirect-esc)');
+      $(else)
+        location.href = '$(link-status)';
       $(endif)
-      location.href = unescape('$(link-redirect-esc)');
     }
   </script>
 </head>
@@ -51,9 +57,11 @@
 
     <p class="text-[10px] text-slate-400 dark:text-white/50 uppercase tracking-[0.15em]">
       If you are not redirected,
-      <a href="$(link-orig)"
-        class="text-neon-blue font-bold border-b border-neon-blue/20 hover:border-neon-blue transition-all">click
-        here</a>
+      $(if popup == 'true')
+      <a href="$(link-orig)" class="text-neon-blue font-bold border-b border-neon-blue/20 hover:border-neon-blue transition-all">click here</a>
+      $(else)
+      <a href="$(link-status)" class="text-neon-blue font-bold border-b border-neon-blue/20 hover:border-neon-blue transition-all">click here</a>
+      $(endif)
     </p>
     <div class="text-center mt-12 text-[9px] uppercase tracking-[0.3em] text-slate-400 dark:text-white/70">
       @config('footer')
